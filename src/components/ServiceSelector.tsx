@@ -80,6 +80,38 @@ export const ServiceSelector = () => {
     });
   };
 
+  const getCategorySelectionState = (category: string) => {
+    const services = getServicesByCategory(category);
+    const selectedCount = services.filter(s => selectedServices.has(s.id)).length;
+    
+    if (selectedCount === 0) {
+      return { checked: false, indeterminate: false };
+    } else if (selectedCount === services.length) {
+      return { checked: true, indeterminate: false };
+    } else {
+      return { checked: false, indeterminate: true };
+    }
+  };
+
+  const toggleCategory = (category: string) => {
+    const services = getServicesByCategory(category);
+    const { checked, indeterminate } = getCategorySelectionState(category);
+    
+    setSelectedServices(prev => {
+      const next = new Set(prev);
+      
+      if (checked) {
+        // If all selected, deselect all
+        services.forEach(service => next.delete(service.id));
+      } else {
+        // If none or some selected, select all
+        services.forEach(service => next.add(service.id));
+      }
+      
+      return next;
+    });
+  };
+
   const calculateTotal = () => {
     let total = 0;
     categories.forEach(category => {
@@ -108,15 +140,24 @@ export const ServiceSelector = () => {
         {/* Left Panel - Categories */}
         <aside className="w-64 lg:w-80 shrink-0 sticky top-20 h-[calc(100vh-120px)] hidden md:flex flex-col justify-center px-2 py-4 overflow-hidden">
           <nav className="space-y-1">
-            {categories.map((category, index) => (
-              <CategoryHeading
-                key={category}
-                category={category}
-                isActive={index === activeCategory}
-                distance={Math.abs(index - activeCategory)}
-                onClick={() => scrollToCategory(index)}
-              />
-            ))}
+            {categories.map((category, index) => {
+              const selectionState = getCategorySelectionState(category);
+              return (
+                <CategoryHeading
+                  key={category}
+                  category={category}
+                  isActive={index === activeCategory}
+                  distance={Math.abs(index - activeCategory)}
+                  onClick={() => scrollToCategory(index)}
+                  checked={selectionState.checked}
+                  indeterminate={selectionState.indeterminate}
+                  onCheckboxChange={(e) => {
+                    e.stopPropagation();
+                    toggleCategory(category);
+                  }}
+                />
+              );
+            })}
           </nav>
         </aside>
 
