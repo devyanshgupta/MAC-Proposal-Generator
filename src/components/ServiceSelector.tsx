@@ -10,8 +10,11 @@ export const ServiceSelector = () => {
   const [selectedServices, setSelectedServices] = useState<Set<string>>(new Set());
   const contentRef = useRef<HTMLDivElement>(null);
   const categoryRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const isScrollingRef = useRef(false);
 
   const handleScroll = useCallback(() => {
+    // Skip updating active category during programmatic scroll
+    if (isScrollingRef.current) return;
     if (!contentRef.current) return;
 
     const container = contentRef.current;
@@ -49,13 +52,19 @@ export const ServiceSelector = () => {
     const container = contentRef.current;
     if (!ref || !container) return;
 
-    // Immediately mark active so the left nav doesn't "jump" during smooth scroll.
+    // Immediately mark active and block scroll handler during animation
     setActiveCategory(index);
+    isScrollingRef.current = true;
 
     container.scrollTo({
       top: ref.offsetTop,
       behavior: "smooth",
     });
+
+    // Re-enable scroll handler after animation completes
+    setTimeout(() => {
+      isScrollingRef.current = false;
+    }, 500);
   };
 
   const toggleService = (id: string) => {
