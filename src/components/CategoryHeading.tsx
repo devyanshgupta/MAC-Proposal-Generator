@@ -33,8 +33,9 @@ export const CategoryHeading = ({ category, isActive, distance, onClick }: Categ
 
   return (
     <motion.button
+      type="button"
       onClick={onClick}
-      className="block text-left cursor-pointer origin-left whitespace-nowrap"
+      className="block w-full text-left cursor-pointer origin-left whitespace-nowrap select-none"
       initial={false}
       animate={{
         scale: getScale(),
@@ -47,7 +48,7 @@ export const CategoryHeading = ({ category, isActive, distance, onClick }: Categ
         ease: [0.25, 0.1, 0.25, 1],
       }}
       whileHover={{ opacity: 1 }}
-      style={{ fontSize: "clamp(1.5rem, 2.5vw, 2.5rem)" }}
+      style={{ fontSize: "clamp(1.5rem, 2.5vw, 2.5rem)", willChange: "transform" }}
     >
       <span className="flex items-center gap-2">
         <motion.span

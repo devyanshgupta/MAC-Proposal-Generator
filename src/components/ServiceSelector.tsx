@@ -16,16 +16,17 @@ export const ServiceSelector = () => {
 
     const container = contentRef.current;
     const containerTop = container.scrollTop;
-    const containerHeight = container.clientHeight;
+
+    // Anchor a bit below the top padding so the active category feels stable.
+    const anchor = containerTop + 24;
 
     let closestCategory = 0;
     let closestDistance = Infinity;
 
     categoryRefs.current.forEach((ref, index) => {
       if (!ref) return;
-      const elementTop = ref.offsetTop - container.offsetTop;
-      const distance = Math.abs(elementTop - containerTop - containerHeight / 4);
-      
+      const distance = Math.abs(ref.offsetTop - anchor);
+
       if (distance < closestDistance) {
         closestDistance = distance;
         closestCategory = index;
@@ -45,16 +46,16 @@ export const ServiceSelector = () => {
 
   const scrollToCategory = (index: number) => {
     const ref = categoryRefs.current[index];
-    if (ref && contentRef.current) {
-      const containerRect = contentRef.current.getBoundingClientRect();
-      const elementRect = ref.getBoundingClientRect();
-      const scrollTop = contentRef.current.scrollTop + (elementRect.top - containerRect.top);
-      
-      contentRef.current.scrollTo({
-        top: scrollTop,
-        behavior: "smooth"
-      });
-    }
+    const container = contentRef.current;
+    if (!ref || !container) return;
+
+    // Immediately mark active so the left nav doesn't "jump" during smooth scroll.
+    setActiveCategory(index);
+
+    container.scrollTo({
+      top: ref.offsetTop,
+      behavior: "smooth",
+    });
   };
 
   const toggleService = (id: string) => {
