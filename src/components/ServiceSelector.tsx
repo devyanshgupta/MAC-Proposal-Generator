@@ -46,8 +46,12 @@ export const ServiceSelector = () => {
   const scrollToCategory = (index: number) => {
     const ref = categoryRefs.current[index];
     if (ref && contentRef.current) {
+      const containerRect = contentRef.current.getBoundingClientRect();
+      const elementRect = ref.getBoundingClientRect();
+      const scrollTop = contentRef.current.scrollTop + (elementRect.top - containerRect.top);
+      
       contentRef.current.scrollTo({
-        top: ref.offsetTop - contentRef.current.offsetTop,
+        top: scrollTop,
         behavior: "smooth"
       });
     }
@@ -88,8 +92,8 @@ export const ServiceSelector = () => {
 
       <div className="max-w-7xl mx-auto flex">
         {/* Left Panel - Categories */}
-        <aside className="w-64 lg:w-80 shrink-0 sticky top-20 h-[calc(100vh-120px)] hidden md:flex flex-col justify-center px-6 py-8">
-          <nav className="space-y-3">
+        <aside className="w-56 lg:w-72 shrink-0 sticky top-20 h-[calc(100vh-120px)] hidden md:flex flex-col justify-center px-4 py-4 overflow-hidden">
+          <nav className="space-y-1">
             {categories.map((category, index) => (
               <CategoryHeading
                 key={category}
