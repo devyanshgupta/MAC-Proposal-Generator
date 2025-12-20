@@ -1,13 +1,27 @@
 import { motion } from "framer-motion";
+import { useRef, useEffect } from "react";
+import { Minus } from "lucide-react";
 
 interface CategoryHeadingProps {
   category: string;
   isActive: boolean;
   distance: number;
   onClick: () => void;
+  checked: boolean;
+  indeterminate: boolean;
+  onCheckboxChange: (e: React.MouseEvent) => void;
 }
 
-export const CategoryHeading = ({ category, isActive, distance, onClick }: CategoryHeadingProps) => {
+export const CategoryHeading = ({ 
+  category, 
+  isActive, 
+  distance, 
+  onClick, 
+  checked, 
+  indeterminate, 
+  onCheckboxChange 
+}: CategoryHeadingProps) => {
+  const checkboxRef = useRef<HTMLInputElement>(null);
   // Calculate scale based on distance from active heading
   const getScale = () => {
     if (distance === 0) return 1;
@@ -31,6 +45,13 @@ export const CategoryHeading = ({ category, isActive, distance, onClick }: Categ
     return 500;
   };
 
+  // Set indeterminate state on checkbox
+  useEffect(() => {
+    if (checkboxRef.current) {
+      checkboxRef.current.indeterminate = indeterminate;
+    }
+  }, [indeterminate]);
+
   return (
     <motion.button
       type="button"
@@ -50,7 +71,7 @@ export const CategoryHeading = ({ category, isActive, distance, onClick }: Categ
       whileHover={{ opacity: 1 }}
       style={{ fontSize: "clamp(1.5rem, 2.5vw, 2.5rem)", willChange: "transform" }}
     >
-      <span className="flex items-start gap-2">
+      <span className="flex items-start gap-3">
         <motion.span
           className="w-6 h-0.5 bg-primary rounded-full origin-left mt-4 shrink-0"
           initial={false}
@@ -63,6 +84,35 @@ export const CategoryHeading = ({ category, isActive, distance, onClick }: Categ
             ease: "easeOut",
           }}
         />
+        <span 
+          className="relative mt-2 shrink-0"
+          onClick={(e) => {
+            e.stopPropagation();
+            onCheckboxChange(e);
+          }}
+        >
+          <input
+            ref={checkboxRef}
+            type="checkbox"
+            checked={checked}
+            onChange={() => {}}
+            className="w-5 h-5 rounded border-2 border-primary/40 cursor-pointer accent-primary appearance-none checked:bg-primary checked:border-primary hover:border-primary/60 transition-colors relative"
+            style={{
+              backgroundImage: checked && !indeterminate 
+                ? 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 16 16\' fill=\'white\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z\'/%3E%3C/svg%3E")'
+                : 'none',
+              backgroundSize: '100% 100%',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+          />
+          {indeterminate && (
+            <Minus 
+              className="absolute inset-0 m-auto w-3 h-3 text-primary pointer-events-none" 
+              strokeWidth={3}
+            />
+          )}
+        </span>
         <span className="break-words leading-tight">{category}</span>
       </span>
     </motion.button>
