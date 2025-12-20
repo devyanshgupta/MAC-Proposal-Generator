@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CategoryHeading } from "./CategoryHeading";
 import { ServiceItem } from "./ServiceItem";
 import { TotalBar } from "./TotalBar";
+import { ClientInfo } from "./ClientInfo";
 import { categories, getServicesByCategory, ServiceItem as ServiceItemType } from "@/data/servicesData";
 
 export const ServiceSelector = () => {
@@ -99,6 +100,9 @@ export const ServiceSelector = () => {
           <h1 className="text-lg font-semibold text-foreground">Service Configurator</h1>
         </div>
       </header>
+
+      {/* Client Information Section */}
+      <ClientInfo />
 
       <div className="max-w-7xl mx-auto flex">
         {/* Left Panel - Categories */}
