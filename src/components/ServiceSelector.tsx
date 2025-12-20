@@ -106,7 +106,7 @@ export const ServiceSelector = () => {
 
       <div className="max-w-7xl mx-auto flex">
         {/* Left Panel - Categories */}
-        <aside className="w-56 lg:w-72 shrink-0 sticky top-20 h-[calc(100vh-120px)] hidden md:flex flex-col justify-center px-4 py-4 overflow-hidden">
+        <aside className="w-64 lg:w-80 shrink-0 sticky top-20 h-[calc(100vh-120px)] hidden md:flex flex-col justify-center px-2 py-4 overflow-hidden">
           <nav className="space-y-1">
             {categories.map((category, index) => (
               <CategoryHeading
