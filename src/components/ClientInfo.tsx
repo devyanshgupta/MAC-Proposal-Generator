@@ -44,6 +44,29 @@ export const ClientInfo = () => {
               className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
             />
           </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="client-DIN" className="text-sm font-medium text-foreground/70 mb-2">
+              Client DIN Number
+            </label>
+            <input
+              id="client-din"
+              type="text"
+              placeholder="Enter din"
+              className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="client-DIN" className="text-sm font-medium text-foreground/70 mb-2">
+              Client DIN Number
+            </label>
+            <input
+              id="client-din"
+              type="text"
+              placeholder="Enter din"
+              className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            />
+          </div>
         </div>
       </div>
     </motion.div>
