@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { v4 as uuidv4 } from 'uuid';
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -19,7 +18,8 @@ export const CustomServiceForm = ({ categories, onAddService }: CustomServiceFor
   const [isNewCategory, setIsNewCategory] = useState(false);
   const [newCategory, setNewCategory] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!service || price === "" || (!category && !newCategory)) {
       // Basic validation
@@ -29,20 +29,33 @@ export const CustomServiceForm = ({ categories, onAddService }: CustomServiceFor
     const finalCategory = isNewCategory ? newCategory : category;
     if (!finalCategory) return;
 
-    onAddService({
-      id: uuidv4(),
+    const newService = {
       service,
       price: Number(price),
       billingCycle,
       category: finalCategory,
-    });
+    };
 
-    // Reset form
-    setService("");
-    setPrice("");
-    setCategory("");
-    setNewCategory("");
-    setIsNewCategory(false);
+    try {
+      const response = await fetch('/api/services', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newService),
+      });
+      const addedService = await response.json();
+      onAddService(addedService);
+
+      // Reset form
+      setService("");
+      setPrice("");
+      setCategory("");
+      setNewCategory("");
+      setIsNewCategory(false);
+    } catch (error) {
+      console.error("Error adding service:", error);
+    }
   };
 
   return (

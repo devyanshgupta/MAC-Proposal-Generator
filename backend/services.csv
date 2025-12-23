@@ -1,38 +1,40 @@
-id,category,service,price,billingCycle
-web-1,tis changed hahahahaha,Custom landing page design & development,2500,One-off
-web-2,Web Development and related shit necessary,E-commerce store setup with payment integration,8000,One-off
-web-3,Web Development and related shit necessary,Progressive web app development,12000,One-off
-web-4,Web Development and related shit necessary,API integration & backend services,5000,Monthly
-web-5,Web Development and related shit necessary,Website performance optimization,1500,Monthly
-mobile-1,Mobile Apps,iOS native application development,25000,One-off
-mobile-2,Mobile Apps,Android native application development,22000,One-off
-mobile-3,Mobile Apps,Cross-platform React Native app,18000,One-off
-mobile-4,Mobile Apps,App store submission & optimization,800,One-off
-mobile-5,Mobile Apps,Push notification system integration,2000,Monthly
-brand-1,Brand Identity,Logo design with brand guidelines,3500,One-off
-brand-2,Brand Identity,Complete visual identity package,8000,One-off
-brand-3,Brand Identity,Brand strategy & positioning,5000,One-off
-brand-4,Brand Identity,Stationery & collateral design,2000,One-off
-ux-1,UI/UX Design,User research & persona development,4000,One-off
-ux-2,UI/UX Design,Wireframing & prototyping,3500,One-off
-ux-3,UI/UX Design,High-fidelity UI design,6000,One-off
-ux-4,UI/UX Design,Design system creation,8000,Yearly
-ux-5,UI/UX Design,Usability testing & iteration,3000,Monthly
-mkt-1,Marketing,Social media strategy & management,2500,Monthly
-mkt-2,Marketing,Content marketing & copywriting,3000,Monthly
-mkt-3,Marketing,SEO optimization package,4000,Monthly
-mkt-4,Marketing,Email marketing campaigns,1800,Monthly
-mkt-5,Marketing,Paid advertising management,2000,Quarterly
-cons-1,Consulting,Technical architecture review,3500,One-off
-cons-2,Consulting,Digital transformation strategy,10000,One-off
-cons-3,Consulting,Product roadmap planning,5000,One-off
-cons-4,Consulting,Team training & workshops,2500,One-off
-cloud-1,Cloud Services,AWS/GCP infrastructure setup,6000,One-off
-cloud-2,Cloud Services,CI/CD pipeline implementation,4000,One-off
-cloud-3,Cloud Services,Database design & optimization,5000,Monthly
-cloud-4,Cloud Services,Security audit & hardening,7000,Quarterly
-cloud-5,Cloud Services,24/7 monitoring & maintenance,3000,Monthly
-ana-1,Analytics,Analytics setup & configuration,2000,One-off
-ana-2,Analytics,Custom dashboard development,4500,One-off
-ana-3,Analytics,Data visualization & reporting,3500,Monthly
-ana-4,Analytics,Conversion optimization,3000,Monthly
+category,service,price,billingCycle,id
+tis changed hahahahaha,Custom landing page design & development,2500.0,One-off,
+Web Development and related shit necessary,E-commerce store setup with payment integration,8000.0,One-off,
+Web Development and related shit necessary,Progressive web app development,12000.0,One-off,
+Web Development and related shit necessary,API integration & backend services,5000.0,Monthly,
+Web Development and related shit necessary,Website performance optimization,1500.0,Monthly,
+Mobile Apps,iOS native application development,25000.0,One-off,
+Mobile Apps,Android native application development,22000.0,One-off,
+Mobile Apps,Cross-platform React Native app,18000.0,One-off,
+Mobile Apps,App store submission & optimization,800.0,One-off,
+Mobile Apps,Push notification system integration,2000.0,Monthly,
+Brand Identity,Logo design with brand guidelines,3500.0,One-off,
+Brand Identity,Complete visual identity package,8000.0,One-off,
+Brand Identity,Brand strategy & positioning,5000.0,One-off,
+Brand Identity,Stationery & collateral design,2000.0,One-off,
+UI/UX Design,User research & persona development,4000.0,One-off,
+UI/UX Design,Wireframing & prototyping,3500.0,One-off,
+UI/UX Design,High-fidelity UI design,6000.0,One-off,
+UI/UX Design,Design system creation,8000.0,Yearly,
+UI/UX Design,Usability testing & iteration,3000.0,Monthly,
+Marketing,Social media strategy & management,2500.0,Monthly,
+Marketing,Content marketing & copywriting,3000.0,Monthly,
+Marketing,SEO optimization package,4000.0,Monthly,
+Marketing,Email marketing campaigns,1800.0,Monthly,
+Marketing,Paid advertising management,2000.0,Quarterly,
+Consulting,Technical architecture review,3500.0,One-off,
+Consulting,Digital transformation strategy,10000.0,One-off,
+Consulting,Product roadmap planning,5000.0,One-off,
+Consulting,Team training & workshops,2500.0,One-off,
+Cloud Services,AWS/GCP infrastructure setup,6000.0,One-off,
+Cloud Services,CI/CD pipeline implementation,4000.0,One-off,
+Cloud Services,Database design & optimization,5000.0,Monthly,
+Cloud Services,Security audit & hardening,7000.0,Quarterly,
+Cloud Services,24/7 monitoring & maintenance,3000.0,Monthly,
+Analytics,Analytics setup & configuration,2000.0,One-off,
+Analytics,Custom dashboard development,4500.0,One-off,
+Analytics,Data visualization & reporting,3500.0,Monthly,
+Analytics,Conversion optimization,3000.0,Monthly,
+Brand Identity,efgsd,33434.0,One-off,
+Brand Identity,wdsfasdf,23423.0,One-off,
