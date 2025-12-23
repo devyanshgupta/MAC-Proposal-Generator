@@ -5,6 +5,7 @@ import { ServiceItem } from "./ServiceItem";
 import { TotalBar } from "./TotalBar";
 import { ClientInfo } from "./ClientInfo";
 import { CustomServiceForm } from "./CustomServiceForm";
+import { SearchBar } from "./SearchBar";
 import { ServiceItem as ServiceItemType } from "@/data/servicesData";
 
 export const ServiceSelector = () => {
@@ -13,6 +14,7 @@ export const ServiceSelector = () => {
   const [customPrices, setCustomPrices] = useState<Record<string, number>>({});
   const [allServices, setAllServices] = useState<ServiceItemType[]>([]);
   const [allCategories, setAllCategories] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const contentRef = useRef<HTMLDivElement>(null);
   const categoryRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -34,9 +36,11 @@ export const ServiceSelector = () => {
     fetchServices();
   }, []);
 
-
-  const getServicesByCategory = (category: string) => 
-    allServices.filter(s => s.category === category);
+  const getServicesByCategory = (category: string) =>
+    allServices.filter(s =>
+      s.category === category &&
+      s.service.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   const handleScroll = useCallback(() => {
     if (isScrollingRef.current) return;
@@ -116,7 +120,7 @@ export const ServiceSelector = () => {
     const selectedCount = services.filter(s => selectedServices.has(s.id)).length;
     
     if (selectedCount === 0) return { checked: false, indeterminate: false };
-    if (selectedCount === services.length) return { checked: true, indeterminate: false };
+    if (selectedCount === services.length && services.length > 0) return { checked: true, indeterminate: false };
     return { checked: false, indeterminate: true };
   };
 
@@ -144,6 +148,10 @@ export const ServiceSelector = () => {
     }, 0);
   };
 
+  const filteredCategories = allCategories.filter(category => 
+    getServicesByCategory(category).length > 0
+  );
+
   return (
     <div className="min-h-screen bg-background pb-24">
       <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border">
@@ -163,9 +171,12 @@ export const ServiceSelector = () => {
       </header>
 
       <div className="max-w-7xl mx-auto flex">
-        <aside className="w-72 lg:w-80 shrink-0 sticky top-20 h-[calc(100vh-120px)] hidden md:flex flex-col justify-center -ml-4 pl-0 pr-4 py-4 overflow-hidden">
-          <nav className="space-y-2">
-            {allCategories.map((category, index) => {
+        <aside className="w-72 lg:w-80 shrink-0 sticky top-20 h-[calc(100vh-120px)] hidden md:flex flex-col -ml-4 pl-0 pr-4 py-4 overflow-hidden">
+          <div className="px-4 mb-4">
+            <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+          </div>
+          <nav className="space-y-2 overflow-y-auto">
+            {filteredCategories.map((category, index) => {
               const selectionState = getCategorySelectionState(category);
               return (
                 <CategoryHeading
@@ -191,15 +202,18 @@ export const ServiceSelector = () => {
           className="flex-1 overflow-y-auto h-[calc(100vh-80px)] scrollbar-hide px-6 lg:px-12 py-8 scroll-pt-24 pb-24"
         >
           <ClientInfo />
+          <div className="md:hidden mb-8">
+            <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+          </div>
 
-          {allCategories.map((category, categoryIndex) => {
+          {filteredCategories.map((category, categoryIndex) => {
             const services = getServicesByCategory(category);
             if (services.length === 0) return null;
             
             return (
               <div
                 key={category}
-                ref={el => categoryRefs.current[categoryIndex] = el}
+                ref={el => categoryRefs.current[allCategories.indexOf(category)] = el}
                 className="mb-16"
               >
                 <motion.h2 
