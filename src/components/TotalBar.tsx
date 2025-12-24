@@ -3,9 +3,16 @@ import { motion, AnimatePresence } from "framer-motion";
 interface TotalBarProps {
   total: number;
   selectedCount: number;
+  onGeneratePdf: () => void;
+  onPrepareProposal?: () => void;
+  isGenerating?: boolean;
+  isPreparing?: boolean;
 }
 
-export const TotalBar = ({ total, selectedCount }: TotalBarProps) => {
+export const TotalBar = ({ total, selectedCount, onGeneratePdf, onPrepareProposal, isGenerating, isPreparing }: TotalBarProps) => {
+  const disabledGenerate = selectedCount === 0 || isGenerating || isPreparing;
+  const disabledPrepare = isGenerating || isPreparing;
+
   return (
     <motion.div
       initial={{ y: 100, opacity: 0 }}
@@ -14,12 +21,34 @@ export const TotalBar = ({ total, selectedCount }: TotalBarProps) => {
     >
       <div className="total-gradient backdrop-blur-lg border-t border-primary/20">
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between gap-4">
-          <button 
-            type="button"
-            className="px-6 py-2.5 bg-primary-foreground text-primary rounded-lg font-semibold hover:opacity-90 transition-opacity shrink-0"
-          >
-            Generate PDF
-          </button>
+          <div className="flex items-center gap-3">
+            {onPrepareProposal && (
+              <button 
+                type="button"
+                onClick={onPrepareProposal}
+                disabled={disabledPrepare}
+                className={`px-6 py-2.5 rounded-lg font-semibold transition-opacity shrink-0 ${
+                  disabledPrepare
+                    ? "bg-muted text-muted-foreground cursor-not-allowed"
+                    : "bg-primary-foreground text-primary hover:opacity-90"
+                }`}
+              >
+                {isPreparing ? "Preparing..." : "Prepare Proposal"}
+              </button>
+            )}
+            <button 
+              type="button"
+              onClick={onGeneratePdf}
+              disabled={disabledGenerate}
+              className={`px-6 py-2.5 rounded-lg font-semibold transition-opacity shrink-0 ${
+                disabledGenerate
+                  ? "bg-muted text-muted-foreground cursor-not-allowed"
+                  : "bg-primary-foreground text-primary hover:opacity-90"
+              }`}
+            >
+              {isGenerating ? "Generating..." : "Generate Engagement Letter"}
+            </button>
+          </div>
           
           <div className="flex items-center gap-4 ml-auto">
             <AnimatePresence mode="wait">

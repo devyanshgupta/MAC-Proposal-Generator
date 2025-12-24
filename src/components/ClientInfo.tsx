@@ -1,6 +1,26 @@
 import { motion } from "framer-motion";
 
-export const ClientInfo = () => {
+interface ClientInfoProps {
+  clientName: string;
+  gstin: string;
+  address: string;
+  din: string;
+  preparedBy: string;
+  proposalDate: string;
+  greeting: string;
+  onFieldChange: (field: string, value: string) => void;
+}
+
+export const ClientInfo = ({
+  clientName,
+  gstin,
+  address,
+  din,
+  preparedBy,
+  proposalDate,
+  greeting,
+  onFieldChange,
+}: ClientInfoProps) => {
   return (
     <motion.div
       initial={{ y: -20, opacity: 0 }}
@@ -18,6 +38,8 @@ export const ClientInfo = () => {
               id="client-name"
               type="text"
               placeholder="Enter client name"
+              value={clientName}
+              onChange={(e) => onFieldChange("name", e.target.value)}
               className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
             />
           </div>
@@ -30,6 +52,8 @@ export const ClientInfo = () => {
               id="client-gstin"
               type="text"
               placeholder="Enter GSTIN"
+              value={gstin}
+              onChange={(e) => onFieldChange("gstin", e.target.value)}
               className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
             />
           </div>
@@ -42,30 +66,63 @@ export const ClientInfo = () => {
               id="client-address"
               type="text"
               placeholder="Enter address"
+              value={address}
+              onChange={(e) => onFieldChange("address", e.target.value)}
               className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
             />
           </div>
 
           <div className="flex flex-col">
-            <label htmlFor="client-DIN" className="text-sm font-medium text-foreground/70 mb-2">
+            <label htmlFor="client-din" className="text-sm font-medium text-foreground/70 mb-2">
               Client DIN Number
             </label>
             <input
               id="client-din"
               type="text"
-              placeholder="Enter din"
+              placeholder="Enter DIN"
+              value={din}
+              onChange={(e) => onFieldChange("din", e.target.value)}
               className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
             />
           </div>
+
           <div className="flex flex-col">
-            <label htmlFor="client-DIN" className="text-sm font-medium text-foreground/70 mb-2">
-              Client DIN Number
+            <label htmlFor="prepared-by" className="text-sm font-medium text-foreground/70 mb-2">
+              Prepared By
             </label>
             <input
-              id="client-din"
+              id="prepared-by"
               type="text"
-              placeholder="Enter din"
+              placeholder="Your firm name"
+              value={preparedBy}
+              onChange={(e) => onFieldChange("preparedBy", e.target.value)}
               className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="proposal-date" className="text-sm font-medium text-foreground/70 mb-2">
+              Proposal Date
+            </label>
+            <input
+              id="proposal-date"
+              type="date"
+              value={proposalDate}
+              onChange={(e) => onFieldChange("date", e.target.value)}
+              className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            />
+          </div>
+
+          <div className="flex flex-col md:col-span-3">
+            <label htmlFor="greeting" className="text-sm font-medium text-foreground/70 mb-2">
+              Greeting / Message
+            </label>
+            <textarea
+              id="greeting"
+              placeholder="Add a short message for the client"
+              value={greeting}
+              onChange={(e) => onFieldChange("message", e.target.value)}
+              className="px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all min-h-[96px]"
             />
           </div>
         </div>

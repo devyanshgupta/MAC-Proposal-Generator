@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { pdf } from "@react-pdf/renderer";
 import { CategoryHeading } from "./CategoryHeading";
 import { ServiceItem } from "./ServiceItem";
 import { TotalBar } from "./TotalBar";
@@ -7,6 +8,8 @@ import { ClientInfo } from "./ClientInfo";
 import { CustomServiceForm } from "./CustomServiceForm";
 import { SearchBar } from "./SearchBar";
 import { ServiceItem as ServiceItemType } from "@/data/servicesData";
+import { ProposalDocument } from "@/pdf/ProposalDocument";
+import { ProposalPayload, ProposalResponse } from "@/types/proposal";
 
 export const ServiceSelector = () => {
   const [activeCategory, setActiveCategory] = useState(0);
@@ -15,6 +18,17 @@ export const ServiceSelector = () => {
   const [allServices, setAllServices] = useState<ServiceItemType[]>([]);
   const [allCategories, setAllCategories] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [clientInfo, setClientInfo] = useState({
+    name: "",
+    gstin: "",
+    address: "",
+    din: "",
+    preparedBy: "Mayur & Company Chartered Accountants",
+    message: "Thank you for considering our firm. We look forward to delivering value through the services outlined below.",
+    date: new Date().toISOString().slice(0, 10),
+  });
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isPreparing, setIsPreparing] = useState(false);
 
   const contentRef = useRef<HTMLDivElement>(null);
   const categoryRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -148,6 +162,104 @@ export const ServiceSelector = () => {
     }, 0);
   };
 
+  const handleClientFieldChange = (field: string, value: string) => {
+    setClientInfo(prev => ({ ...prev, [field]: value }));
+  };
+
+  const buildProposalPayload = (): ProposalPayload => {
+    const selected = allServices.filter(s => selectedServices.has(s.id));
+    return {
+      client: {
+        name: clientInfo.name,
+        gstin: clientInfo.gstin,
+        address: clientInfo.address,
+        din: clientInfo.din,
+      },
+      proposal: {
+        preparedFor: clientInfo.name || "Client",
+        preparedBy: clientInfo.preparedBy,
+        date: clientInfo.date,
+        message: clientInfo.message,
+      },
+      services: selected.map((svc) => ({
+        id: svc.id,
+        category: svc.category,
+        service: svc.service,
+        billingCycle: svc.billingCycle,
+        price: svc.price,
+        discountedPrice: customPrices[svc.id] ?? svc.price,
+      })),
+    };
+  };
+
+  const handleGeneratePdf = async () => {
+    if (selectedServices.size === 0) {
+      alert("Select at least one service to generate a proposal.");
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const payload = buildProposalPayload();
+      const response = await fetch("/api/proposal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate proposal data");
+      }
+
+      const normalized: ProposalResponse = await response.json();
+      const blob = await pdf(<ProposalDocument data={normalized} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `proposal-${payload.proposal.date || "today"}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      alert("Unable to generate PDF. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handlePrepareProposal = async () => {
+    if (!clientInfo.name || clientInfo.name.trim() === "") {
+      alert("Please enter a client name to prepare the proposal.");
+      return;
+    }
+
+    setIsPreparing(true);
+    try {
+      const response = await fetch("/api/proposal_letter/details", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clientName: clientInfo.name }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate proposal letter");
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `proposal-${clientInfo.name.replace(/\s+/g, "_")}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      alert("Unable to prepare proposal. Please try again.");
+    } finally {
+      setIsPreparing(false);
+    }
+  };
+
   const filteredCategories = allCategories.filter(category => 
     getServicesByCategory(category).length > 0
   );
@@ -201,7 +313,16 @@ export const ServiceSelector = () => {
           ref={contentRef}
           className="flex-1 overflow-y-auto h-[calc(100vh-80px)] scrollbar-hide px-6 lg:px-12 py-8 scroll-pt-24 pb-24"
         >
-          <ClientInfo />
+          <ClientInfo
+            clientName={clientInfo.name}
+            gstin={clientInfo.gstin}
+            address={clientInfo.address}
+            din={clientInfo.din}
+            preparedBy={clientInfo.preparedBy}
+            proposalDate={clientInfo.date}
+            greeting={clientInfo.message}
+            onFieldChange={handleClientFieldChange}
+          />
           <div className="md:hidden mb-8">
             <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
           </div>
@@ -260,6 +381,10 @@ export const ServiceSelector = () => {
       <TotalBar 
         total={calculateTotal()} 
         selectedCount={selectedServices.size}
+        onGeneratePdf={handleGeneratePdf}
+        onPrepareProposal={handlePrepareProposal}
+        isGenerating={isGenerating}
+        isPreparing={isPreparing}
       />
     </div>
   );
