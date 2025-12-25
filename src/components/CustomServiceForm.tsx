@@ -14,7 +14,7 @@ interface CustomServiceFormProps {
 export const CustomServiceForm = ({ categories, billingCycles, onAddService }: CustomServiceFormProps) => {
   const [service, setService] = useState("");
   const [price, setPrice] = useState<number | "">("");
-  const [billingCycle, setBillingCycle] = useState<ServiceItem['billingCycle']>('One-off');
+  const [billingCycle, setBillingCycle] = useState<string>('One-off');
   const [category, setCategory] = useState("");
   const [isNewCategory, setIsNewCategory] = useState(false);
   const [newCategory, setNewCategory] = useState("");
@@ -24,10 +24,10 @@ export const CustomServiceForm = ({ categories, billingCycles, onAddService }: C
   const handleBillingCycleChange = (value: string) => {
     if (value === 'custom') {
       setIsNewBillingCycle(true);
-      setBillingCycle('');
+      setBillingCycle('One-off');
     } else {
       setIsNewBillingCycle(false);
-      setBillingCycle(value as ServiceItem['billingCycle']);
+      setBillingCycle(value);
     }
   };
 

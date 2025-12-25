@@ -3,132 +3,97 @@ import { ProposalResponse } from "@/types/proposal";
 
 const styles = StyleSheet.create({
   page: {
-    padding: 40,
+    padding: 50,
     fontSize: 11,
     fontFamily: "Helvetica",
     color: "#1f2937",
+    lineHeight: 1.5,
   },
-  cover: {
-    flex: 1,
-    justifyContent: "space-between",
+  dateRight: {
+    textAlign: "right",
+    marginBottom: 20,
   },
-  coverHeader: {
-    padding: 16,
-    borderWidth: 2,
-    borderColor: "#22a06b",
-    alignSelf: "flex-start",
+  addressBlock: {
+    marginBottom: 20,
   },
-  coverTitle: {
-    fontSize: 36,
-    fontWeight: 700,
-    marginTop: 32,
-    marginBottom: 4,
+  subject: {
+    fontWeight: "bold",
+    marginBottom: 16,
+    textDecoration: "underline",
   },
-  coverSubtitle: {
-    fontSize: 26,
-    fontWeight: 600,
-    marginBottom: 24,
-  },
-  coverTagline: {
-    fontSize: 14,
-    fontWeight: 600,
-    color: "#111827",
-  },
-  coverFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    marginTop: 48,
-  },
-  badge: {
-    height: 4,
-    backgroundColor: "#22a06b",
-    marginTop: 8,
-  },
-  label: {
-    fontSize: 10,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    color: "#6b7280",
-  },
-  value: {
-    fontSize: 12,
-    fontWeight: 600,
-    color: "#111827",
-  },
-  introCard: {
-    padding: 16,
-    backgroundColor: "#f9fafb",
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 8,
+  salutation: {
     marginBottom: 16,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 700,
-    marginBottom: 12,
-    color: "#111827",
+  message: {
+    marginBottom: 20,
+    textAlign: "justify",
   },
-  row: {
-    flexDirection: "row",
-    gap: 16,
-  },
-  col: {
-    flex: 1,
-  },
-  messageBox: {
-    marginTop: 12,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 8,
-    backgroundColor: "#ffffff",
+  categoryTitle: {
+    fontSize: 12,
+    fontWeight: "bold",
+    marginTop: 16,
+    marginBottom: 8,
+    textDecoration: "underline",
   },
   table: {
     width: "100%",
     borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 6,
-    overflow: "hidden",
+    borderColor: "#000",
+    marginBottom: 16,
   },
   tableHeader: {
     flexDirection: "row",
     backgroundColor: "#f3f4f6",
     borderBottomWidth: 1,
+    borderBottomColor: "#000",
+  },
+  tableRow: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
     borderBottomColor: "#e5e7eb",
   },
   headerCell: {
-    paddingVertical: 10,
-    paddingHorizontal: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
     fontSize: 10,
-    fontWeight: 700,
-    color: "#111827",
+    fontWeight: "bold",
+    borderRightWidth: 1,
+    borderRightColor: "#000",
   },
   cell: {
-    paddingVertical: 8,
-    paddingHorizontal: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 6,
     fontSize: 10,
-    color: "#1f2937",
+    borderRightWidth: 1,
+    borderRightColor: "#e5e7eb",
   },
-  rowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#f3f4f6",
+  cellLast: {
+    borderRightWidth: 0,
   },
-  summary: {
-    marginTop: 16,
-    alignSelf: "flex-end",
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 6,
-    backgroundColor: "#f9fafb",
-    minWidth: 180,
+  termsSection: {
+    marginTop: 24,
+    marginBottom: 16,
   },
-  summaryRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  termsTitle: {
+    fontWeight: "bold",
+    marginBottom: 12,
+    textDecoration: "underline",
+  },
+  termItem: {
+    marginBottom: 8,
+    paddingLeft: 10,
+  },
+  signatureSection: {
+    marginTop: 40,
+  },
+  signatureLine: {
     marginBottom: 4,
+  },
+  bold: {
+    fontWeight: "bold",
+  },
+  enclosure: {
+    marginTop: 20,
   },
 });
 
@@ -145,154 +110,134 @@ type ProposalDocumentProps = {
 
 export const ProposalDocument = ({ data }: ProposalDocumentProps) => {
   const services = data.services ?? [];
-  const preparedFor =
-    data.proposal?.preparedFor || data.client?.name || "Client";
-  const preparedBy = data.proposal?.preparedBy || "Mayur & Company";
-  const proposalDate =
-    data.proposal?.date || new Date().toISOString().slice(0, 10);
-  const message =
-    data.proposal?.message ||
-    "Thank you for considering our firm. We look forward to delivering value through the services outlined below.";
+  const clientName = data.client?.name || "Client Name";
+  const cin = data.client?.CIN || "Not Provided";
+  const address = data.client?.address || "Address Not Provided";
+  const proposalDate = data.proposal?.date || new Date().toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "long", 
+    year: "numeric"
+  });
+  const message = data.proposal?.message || 
+    "We are pleased to submit our proposal for providing professional services to your esteemed organization. Please find below the scope of work along with professional fees and terms and conditions.";
+
+  // Group services by category
+  const servicesByCategory = services.reduce((acc, service) => {
+    const category = service.category;
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(service);
+    return acc;
+  }, {} as Record<string, typeof services>);
 
   return (
     <Document>
-      <Page size="A4" style={[styles.page, styles.cover]}>
-        <View>
-          <View style={styles.coverHeader}>
-            <Text style={{ fontSize: 18, fontWeight: 700 }}>
-              Mayur & Company
-            </Text>
-            <Text style={{ fontSize: 11, color: "#16a34a", marginTop: 2 }}>
-              Chartered Accountants
-            </Text>
-          </View>
-
-          <Text style={styles.coverTitle}>SERVICES</Text>
-          <Text style={styles.coverSubtitle}>PROPOSAL</Text>
-          <View style={{ height: 180, backgroundColor: "#e0f2fe" }} />
-        </View>
-
-        <View>
-          <Text style={styles.coverTagline}>A Year of Impact & Innovation</Text>
-          <View style={styles.badge} />
-
-          <View style={[styles.coverFooter, { marginTop: 16 }]}>
-            <View>
-              <Text style={styles.label}>Prepared for</Text>
-              <Text style={styles.value}>{preparedFor}</Text>
-            </View>
-            <View style={{ alignItems: "flex-end" }}>
-              <Text style={styles.label}>Prepared by</Text>
-              <Text style={styles.value}>{preparedBy}</Text>
-              <Text style={[styles.label, { marginTop: 6 }]}>Date</Text>
-              <Text style={styles.value}>{proposalDate}</Text>
-            </View>
-          </View>
-        </View>
-      </Page>
-
       <Page size="A4" style={styles.page}>
-        <Text style={styles.sectionTitle}>Introduction</Text>
-        <View style={styles.introCard}>
-          <View style={styles.row}>
-            <View style={styles.col}>
-              <Text style={styles.label}>To</Text>
-              <Text style={styles.value}>{preparedFor}</Text>
-            </View>
-            <View style={styles.col}>
-              <Text style={styles.label}>From</Text>
-              <Text style={styles.value}>{preparedBy}</Text>
-            </View>
-            <View style={styles.col}>
-              <Text style={styles.label}>Date</Text>
-              <Text style={styles.value}>{proposalDate}</Text>
-            </View>
-          </View>
+        {/* Date - Right aligned */}
+        <Text style={styles.dateRight}>{proposalDate}</Text>
 
-          <View style={styles.row}>
-            <View style={styles.col}>
-              <Text style={[styles.label, { marginTop: 12 }]}>GSTIN</Text>
-              <Text style={styles.value}>
-                {data.client?.gstin || "Not provided"}
-              </Text>
-            </View>
-            <View style={styles.col}>
-              <Text style={[styles.label, { marginTop: 12 }]}>DIN</Text>
-              <Text style={styles.value}>
-                {data.client?.din || "Not provided"}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.messageBox}>
-            <Text style={styles.label}>Message</Text>
-            <Text style={{ marginTop: 6, lineHeight: 1.4 }}>{message}</Text>
-          </View>
-        </View>
-      </Page>
-
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.sectionTitle}>Services</Text>
-        <View style={styles.table}>
-          <View style={styles.tableHeader}>
-            <View style={{ width: "18%" }}>
-              <Text style={styles.headerCell}>Category</Text>
-            </View>
-            <View style={{ width: "32%" }}>
-              <Text style={styles.headerCell}>Service</Text>
-            </View>
-            <View style={{ width: "18%" }}>
-              <Text style={styles.headerCell}>Payment Frequency</Text>
-            </View>
-            <View style={{ width: "16%", alignItems: "flex-end" }}>
-              <Text style={styles.headerCell}>Pricing</Text>
-            </View>
-            <View style={{ width: "16%", alignItems: "flex-end" }}>
-              <Text style={styles.headerCell}>Discounted Price</Text>
-            </View>
-          </View>
-
-          {services.map((svc, idx) => (
-            <View
-              key={svc.id}
-              style={[styles.row, styles.rowBorder]}
-              wrap={false}
-            >
-              <View style={{ width: "18%" }}>
-                <Text style={styles.cell}>{svc.category}</Text>
-              </View>
-              <View style={{ width: "32%" }}>
-                <Text style={styles.cell}>{svc.service}</Text>
-              </View>
-              <View style={{ width: "18%" }}>
-                <Text style={styles.cell}>{svc.billingCycle}</Text>
-              </View>
-              <View style={{ width: "16%", alignItems: "flex-end" }}>
-                <Text style={styles.cell}>{currency(svc.price)}</Text>
-              </View>
-              <View style={{ width: "16%", alignItems: "flex-end" }}>
-                <Text style={styles.cell}>
-                  {currency(
-                    svc.discountedPrice != null ? svc.discountedPrice : svc.price
-                  )}
-                </Text>
-              </View>
-            </View>
-          ))}
+        {/* Address Block - Left aligned */}
+        <View style={styles.addressBlock}>
+          <Text>To,</Text>
+          <Text style={styles.bold}>The Board of Directors</Text>
+          <Text style={styles.bold}>{clientName}</Text>
+          <Text>CIN - {cin}</Text>
+          <Text>Address: {address}</Text>
         </View>
 
-        <View style={styles.summary}>
-          <View style={styles.summaryRow}>
-            <Text style={styles.label}>Services</Text>
-            <Text style={styles.value}>{data.summary?.count ?? 0}</Text>
+        {/* Subject Line */}
+        <Text style={styles.subject}>
+          Sub.: Scope of Work Offered along with Professional Fees and Terms and Conditions of appointment
+        </Text>
+
+        {/* Salutation */}
+        <Text style={styles.salutation}>Sir,</Text>
+
+        {/* Message */}
+        <Text style={styles.message}>{message}</Text>
+
+        {/* Services Tables by Category */}
+        {Object.entries(servicesByCategory).map(([category, categoryServices]) => (
+          <View key={category} wrap={false}>
+            <Text style={styles.categoryTitle}>{category}</Text>
+            <View style={styles.table}>
+              {/* Table Header */}
+              <View style={styles.tableHeader}>
+                <View style={{ width: "50%" }}>
+                  <Text style={styles.headerCell}>Services</Text>
+                </View>
+                <View style={{ width: "25%" }}>
+                  <Text style={styles.headerCell}>Professional Fees</Text>
+                </View>
+                <View style={{ width: "25%" }}>
+                  <Text style={[styles.headerCell, styles.cellLast]}>Personalised Fees</Text>
+                </View>
+              </View>
+
+              {/* Table Rows */}
+              {categoryServices.map((svc, idx) => {
+                const hasCustomPrice = svc.discountedPrice != null && svc.discountedPrice !== svc.price;
+                return (
+                  <View key={svc.id} style={styles.tableRow}>
+                    <View style={{ width: "50%" }}>
+                      <Text style={styles.cell}>{svc.service}</Text>
+                    </View>
+                    <View style={{ width: "25%" }}>
+                      <Text style={styles.cell}>{currency(svc.price)}</Text>
+                    </View>
+                    <View style={{ width: "25%" }}>
+                      <Text style={[styles.cell, styles.cellLast]}>
+                        {hasCustomPrice ? currency(svc.discountedPrice!) : "-"}
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
           </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.label}>Total</Text>
-            <Text style={styles.value}>{currency(data.summary?.total ?? 0)}</Text>
-          </View>
+        ))}
+
+        {/* Terms and Conditions */}
+        <View style={styles.termsSection}>
+          <Text style={styles.termsTitle}>Other Terms and Conditions:</Text>
+          
+          <Text style={styles.termItem}>
+            • GST as per applicable rate will be extra. Presently GST rate is 18%.
+          </Text>
+          
+          <Text style={styles.termItem}>
+            • All out of pocket expenses shall be reimbursed on actual basis. E.g. ROC Fees, Income Tax, Travel and Conveyance for performing auditing at your office etc.
+          </Text>
+          
+          <Text style={styles.termItem}>
+            • Your Company should maintain proper books of accounts, vouchers, bills, and files and provide the same to us on timely manner to enable us to complete the auditing within the prescribed time.
+          </Text>
+          
+          <Text style={styles.termItem}>
+            • Company shall also agree and accept to general terms and conditions of Mayur and Company attached herewith.
+          </Text>
         </View>
+
+        <Text style={{ marginTop: 16, marginBottom: 40 }}>
+          Please send us signed and stamped copy of this letter as a token of your acceptance.
+        </Text>
+
+        {/* Signature Section */}
+        <View style={styles.signatureSection}>
+          <Text style={[styles.signatureLine, styles.bold]}>CA MAYUR GUPTA, FCA</Text>
+          <Text style={styles.signatureLine}>PROPRIETOR</Text>
+          <Text style={[styles.signatureLine, styles.bold]}>FOR MAYUR AND COMPANY</Text>
+          <Text style={styles.signatureLine}>CHARTERED ACCOUNTANTS</Text>
+          <Text style={styles.signatureLine}>DATE – {proposalDate}</Text>
+          <Text style={styles.signatureLine}>PLACE: DELHI</Text>
+          <Text style={styles.signatureLine}>M.NO.503036</Text>
+          <Text style={styles.signatureLine}>FRN-021448N</Text>
+        </View>
+
+        {/* Enclosure */}
+        <Text style={styles.enclosure}>Enc.: a/a</Text>
       </Page>
     </Document>
   );
 };
-
