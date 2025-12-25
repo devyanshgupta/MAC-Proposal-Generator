@@ -5,13 +5,16 @@ interface TotalBarProps {
   selectedCount: number;
   onGeneratePdf: () => void;
   onPrepareProposal?: () => void;
+  onGenerateServicesPdf?: () => void;
   isGenerating?: boolean;
   isPreparing?: boolean;
+  isGeneratingServices?: boolean;
 }
 
-export const TotalBar = ({ total, selectedCount, onGeneratePdf, onPrepareProposal, isGenerating, isPreparing }: TotalBarProps) => {
-  const disabledGenerate = selectedCount === 0 || isGenerating || isPreparing;
-  const disabledPrepare = isGenerating || isPreparing;
+export const TotalBar = ({ total, selectedCount, onGeneratePdf, onPrepareProposal, onGenerateServicesPdf, isGenerating, isPreparing, isGeneratingServices }: TotalBarProps) => {
+  const disabledGenerate = selectedCount === 0 || isGenerating || isPreparing || isGeneratingServices;
+  const disabledPrepare = isGenerating || isPreparing || isGeneratingServices;
+  const disabledServices = selectedCount === 0 || isGenerating || isPreparing || isGeneratingServices;
 
   return (
     <motion.div
@@ -48,6 +51,20 @@ export const TotalBar = ({ total, selectedCount, onGeneratePdf, onPrepareProposa
             >
               {isGenerating ? "Generating..." : "Generate Engagement Letter"}
             </button>
+            {onGenerateServicesPdf && (
+              <button 
+                type="button"
+                onClick={onGenerateServicesPdf}
+                disabled={disabledServices}
+                className={`px-6 py-2.5 rounded-lg font-semibold transition-opacity shrink-0 ${
+                  disabledServices
+                    ? "bg-muted text-muted-foreground cursor-not-allowed"
+                    : "bg-primary-foreground text-primary hover:opacity-90"
+                }`}
+              >
+                {isGeneratingServices ? "Generating..." : "Generate Services PDF"}
+              </button>
+            )}
           </div>
           
           <div className="flex items-center gap-4 ml-auto">

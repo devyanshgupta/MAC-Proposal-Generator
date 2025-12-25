@@ -9,6 +9,7 @@ import { CustomServiceForm } from "./CustomServiceForm";
 import { SearchBar } from "./SearchBar";
 import { ServiceItem as ServiceItemType } from "@/data/servicesData";
 import { ProposalDocument } from "@/pdf/EngagementDocument";
+import { ProposalServicesDocument } from "@/pdf/Proposal_services";
 import { ProposalPayload, ProposalResponse, AdvancedTerm } from "@/types/engagement";
 
 export const ServiceSelector = () => {
@@ -31,6 +32,7 @@ export const ServiceSelector = () => {
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPreparing, setIsPreparing] = useState(false);
+  const [isGeneratingServices, setIsGeneratingServices] = useState(false);
   const [termsAndConditions, setTermsAndConditions] = useState<string[]>([]);
   const [advancedTermsAndConditions, setAdvancedTermsAndConditions] = useState<AdvancedTerm[]>([]);
 
@@ -323,6 +325,40 @@ export const ServiceSelector = () => {
     }
   };
 
+  const handleGenerateServicesPdf = async () => {
+    if (selectedServices.size === 0) {
+      alert("Select at least one service to generate a services PDF.");
+      return;
+    }
+
+    setIsGeneratingServices(true);
+    try {
+      const selected = allServices.filter(s => selectedServices.has(s.id));
+      const services: ProposalPayload["services"] = selected.map((svc) => ({
+        id: svc.id,
+        category: svc.category,
+        service: svc.service,
+        billingCycle: svc.billingCycle,
+        price: svc.price,
+        scopeOfWork: svc.scopeOfWork,
+        discountedPrice: customPrices[svc.id] ?? svc.price,
+      }));
+
+      const blob = await pdf(<ProposalServicesDocument services={services} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `proposal-services-${clientInfo.date || "today"}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      alert("Unable to generate Services PDF. Please try again.");
+    } finally {
+      setIsGeneratingServices(false);
+    }
+  };
+
   const filteredCategories = allCategories.filter(category => 
     getServicesByCategory(category).length > 0
   );
@@ -453,8 +489,10 @@ export const ServiceSelector = () => {
         selectedCount={selectedServices.size}
         onGeneratePdf={handleGeneratePdf}
         onPrepareProposal={handlePrepareProposal}
+        onGenerateServicesPdf={handleGenerateServicesPdf}
         isGenerating={isGenerating}
         isPreparing={isPreparing}
+        isGeneratingServices={isGeneratingServices}
       />
     </div>
   );
