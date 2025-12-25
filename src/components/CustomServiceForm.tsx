@@ -7,55 +7,59 @@ import { ServiceItem } from "@/data/servicesData";
 
 interface CustomServiceFormProps {
   categories: string[];
+  billingCycles: string[];
   onAddService: (service: ServiceItem) => void;
 }
 
-export const CustomServiceForm = ({ categories, onAddService }: CustomServiceFormProps) => {
+export const CustomServiceForm = ({ categories, billingCycles, onAddService }: CustomServiceFormProps) => {
   const [service, setService] = useState("");
   const [price, setPrice] = useState<number | "">("");
   const [billingCycle, setBillingCycle] = useState<ServiceItem['billingCycle']>('One-off');
   const [category, setCategory] = useState("");
   const [isNewCategory, setIsNewCategory] = useState(false);
   const [newCategory, setNewCategory] = useState("");
+  const [isNewBillingCycle, setIsNewBillingCycle] = useState(false);
+  const [newBillingCycle, setNewBillingCycle] = useState("");
 
+  const handleBillingCycleChange = (value: string) => {
+    if (value === 'custom') {
+      setIsNewBillingCycle(true);
+      setBillingCycle('');
+    } else {
+      setIsNewBillingCycle(false);
+      setBillingCycle(value as ServiceItem['billingCycle']);
+    }
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!service || price === "" || (!category && !newCategory)) {
+    const finalCategory = isNewCategory ? newCategory : category;
+    const finalBillingCycle = isNewBillingCycle ? newBillingCycle : billingCycle;
+
+    if (!service || price === "" || !finalCategory || !finalBillingCycle) {
       // Basic validation
       return;
     }
 
-    const finalCategory = isNewCategory ? newCategory : category;
-    if (!finalCategory) return;
-
-    const newService = {
+    const newService: ServiceItem = {
+      id: `custom-${Date.now()}`, // Add a unique ID for custom services
       service,
       price: Number(price),
-      billingCycle,
+      billingCycle: finalBillingCycle as ServiceItem['billingCycle'],
       category: finalCategory,
     };
 
-    try {
-      const response = await fetch('/api/services', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newService),
-      });
-      const addedService = await response.json();
-      onAddService(addedService);
+    onAddService(newService);
 
-      // Reset form
-      setService("");
-      setPrice("");
-      setCategory("");
-      setNewCategory("");
-      setIsNewCategory(false);
-    } catch (error) {
-      console.error("Error adding service:", error);
-    }
+    // Reset form
+    setService("");
+    setPrice("");
+    setCategory("");
+    setNewCategory("");
+    setIsNewCategory(false);
+    setBillingCycle('One-off');
+    setNewBillingCycle("");
+    setIsNewBillingCycle(false);
   };
 
   return (
@@ -102,17 +106,38 @@ export const CustomServiceForm = ({ categories, onAddService }: CustomServiceFor
           {/* Billing Cycle */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Billing Cycle</label>
-            <Select onValueChange={(value: ServiceItem['billingCycle']) => setBillingCycle(value)} value={billingCycle}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="One-off">One-off</SelectItem>
-                <SelectItem value="Monthly">Monthly</SelectItem>
-                <SelectItem value="Yearly">Yearly</SelectItem>
-                <SelectItem value="Quarterly">Quarterly</SelectItem>
-              </SelectContent>
-            </Select>
+            {isNewBillingCycle ? (
+              <Input
+                placeholder="Enter new billing cycle"
+                value={newBillingCycle}
+                onChange={(e) => setNewBillingCycle(e.target.value)}
+                required
+              />
+            ) : (
+              <Select onValueChange={handleBillingCycleChange} value={billingCycle}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a billing cycle" />
+                </SelectTrigger>
+                <SelectContent>
+                  {billingCycles.map((cycle) => (
+                    <SelectItem key={cycle} value={cycle}>{cycle}</SelectItem>
+                  ))}
+                  <SelectItem value="custom">Create a new billing cycle</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+             <Button
+              type="button"
+              variant="link"
+              className="px-0 h-auto text-sm"
+              onClick={() => {
+                setIsNewBillingCycle(!isNewBillingCycle);
+                setBillingCycle('One-off');
+                setNewBillingCycle("");
+              }}
+            >
+              {isNewBillingCycle ? "Or select an existing one" : "Or create a new billing cycle"}
+            </Button>
           </div>
         </div>
 

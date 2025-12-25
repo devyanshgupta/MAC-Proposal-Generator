@@ -17,14 +17,15 @@ export const ServiceSelector = () => {
   const [customPrices, setCustomPrices] = useState<Record<string, number>>({});
   const [allServices, setAllServices] = useState<ServiceItemType[]>([]);
   const [allCategories, setAllCategories] = useState<string[]>([]);
+  const [allBillingCycles, setAllBillingCycles] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [clientInfo, setClientInfo] = useState({
     name: "",
     gstin: "",
     address: "",
-    din: "",
+    CIN: "",
     preparedBy: "Mayur & Company Chartered Accountants",
-    message: "Thank you for considering our firm. We look forward to delivering value through the services outlined below.",
+    message: "Pursuant to our discussions, Mayur and Company Chartered Accountants, hereby propose to provide the following professional services to your company:",
     date: new Date().toISOString().slice(0, 10),
   });
   const [isGenerating, setIsGenerating] = useState(false);
@@ -42,6 +43,8 @@ export const ServiceSelector = () => {
         setAllServices(data);
         const categories = [...new Set(data.map((s: ServiceItemType) => s.category))];
         setAllCategories(categories as string[]);
+        const billingCycles = [...new Set(data.map((s: ServiceItemType) => s.billingCycle))];
+        setAllBillingCycles(billingCycles as string[]);
       } catch (error) {
         console.error("Error fetching services:", error);
       }
@@ -126,6 +129,9 @@ export const ServiceSelector = () => {
     if (!allCategories.includes(service.category)) {
       setAllCategories(prev => [...prev, service.category]);
     }
+    if (!allBillingCycles.includes(service.billingCycle)) {
+      setAllBillingCycles(prev => [...prev, service.billingCycle]);
+    }
     setSelectedServices(prev => new Set(prev).add(service.id));
   };
 
@@ -173,7 +179,7 @@ export const ServiceSelector = () => {
         name: clientInfo.name,
         gstin: clientInfo.gstin,
         address: clientInfo.address,
-        din: clientInfo.din,
+        CIN: clientInfo.CIN,
       },
       proposal: {
         preparedFor: clientInfo.name || "Client",
@@ -317,7 +323,7 @@ export const ServiceSelector = () => {
             clientName={clientInfo.name}
             gstin={clientInfo.gstin}
             address={clientInfo.address}
-            din={clientInfo.din}
+            CIN={clientInfo.CIN}
             preparedBy={clientInfo.preparedBy}
             proposalDate={clientInfo.date}
             greeting={clientInfo.message}
@@ -375,7 +381,11 @@ export const ServiceSelector = () => {
             );
           })}
           
-          <CustomServiceForm categories={allCategories} onAddService={addService} />
+          <CustomServiceForm 
+            categories={allCategories} 
+            billingCycles={allBillingCycles}
+            onAddService={addService} 
+          />
         </main>
       </div>
 

@@ -4,7 +4,7 @@ interface ClientInfoProps {
   clientName: string;
   gstin: string;
   address: string;
-  din: string;
+  CIN: string;
   preparedBy: string;
   proposalDate: string;
   greeting: string;
@@ -15,7 +15,7 @@ export const ClientInfo = ({
   clientName,
   gstin,
   address,
-  din,
+  CIN,
   preparedBy,
   proposalDate,
   greeting,
@@ -73,15 +73,15 @@ export const ClientInfo = ({
           </div>
 
           <div className="flex flex-col">
-            <label htmlFor="client-din" className="text-sm font-medium text-foreground/70 mb-2">
-              Client DIN Number
+            <label htmlFor="client-CIN" className="text-sm font-medium text-foreground/70 mb-2">
+              Client CIN Number
             </label>
             <input
-              id="client-din"
+              id="client-CIN"
               type="text"
-              placeholder="Enter DIN"
-              value={din}
-              onChange={(e) => onFieldChange("din", e.target.value)}
+              placeholder="Enter CIN"
+              value={CIN}
+              onChange={(e) => onFieldChange("CIN", e.target.value)}
               className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
             />
           </div>

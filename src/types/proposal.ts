@@ -12,7 +12,7 @@ export interface ClientInfo {
   name?: string;
   gstin?: string;
   address?: string;
-  din?: string;
+  CIN?: string;
 }
 
 export interface ProposalMeta {
