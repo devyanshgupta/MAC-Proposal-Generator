@@ -232,7 +232,7 @@ export const ProposalDocument = ({ data, termsAndConditions }: ProposalDocumentP
 
         {/* Services Tables by Category */}
         {Object.entries(servicesByCategory).map(([category, categoryServices]) => (
-          <View key={category} wrap={false}>
+          <View key={category}>
             <Text style={styles.categoryTitle}>{category}</Text>
             <View style={styles.table}>
               {/* Table Header */}
@@ -246,7 +246,7 @@ export const ProposalDocument = ({ data, termsAndConditions }: ProposalDocumentP
               {categoryServices.map((svc, idx) => {
                 const hasCustomPrice = svc.discountedPrice != null && svc.discountedPrice !== svc.price;
                 return (
-                  <View key={svc.id} style={styles.tableRow}>
+                  <View key={svc.id} style={styles.tableRow} wrap={false}>
                     <View style={styles.snoCell}>
                       <Text style={styles.snoText}>{idx + 1}.</Text>
                     </View>
