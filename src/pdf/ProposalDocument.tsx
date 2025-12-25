@@ -1,11 +1,19 @@
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
 import { ProposalResponse } from "@/types/proposal";
+
+Font.register({
+  family: 'HK Grotesk',
+  fonts: [
+    { src: '/fonts/hk-grotesk/HKGrotesk-Regular.otf', fontWeight: 'normal' },
+    { src: '/fonts/hk-grotesk/HKGrotesk-Bold.otf', fontWeight: 'bold' },
+  ]
+});
 
 const styles = StyleSheet.create({
   page: {
     padding: 50,
     fontSize: 11,
-    fontFamily: "Helvetica",
+    fontFamily: "HK Grotesk",
     color: "#1f2937",
     lineHeight: 1.5,
   },
@@ -149,10 +157,11 @@ const styles = StyleSheet.create({
   snoText: {
     fontSize: 8,
     color: "#6b7280",
+    fontFamily: "Helvetica",
   },
 });
 
-const formatCurrency = (value: number) => `₹${value.toLocaleString("en-IN")}`;
+const formatCurrency = (value: number) => `${value.toLocaleString("en-IN")}`;
 
 type ProposalDocumentProps = {
   data: ProposalResponse;
@@ -230,7 +239,7 @@ export const ProposalDocument = ({ data, termsAndConditions }: ProposalDocumentP
               <View style={styles.tableHeaderRow}>
                 <Text style={styles.snoHeader}>S.No.</Text>
                 <Text style={styles.scopeHeader}>Scope of Work</Text>
-                <Text style={styles.priceHeader}>Professional Fees</Text>
+                <Text style={styles.priceHeader}>Professional Fees (in INR)</Text>
               </View>
 
               {/* Table Rows */}
@@ -239,9 +248,7 @@ export const ProposalDocument = ({ data, termsAndConditions }: ProposalDocumentP
                 return (
                   <View key={svc.id} style={styles.tableRow}>
                     <View style={styles.snoCell}>
-                      <View style={styles.snoCircle}>
-                        <Text style={styles.snoText}>{idx + 1}</Text>
-                      </View>
+                      <Text style={styles.snoText}>{idx + 1}.</Text>
                     </View>
                     <View style={styles.scopeCell}>
                       <Text style={styles.serviceTitle}>{svc.service}</Text>

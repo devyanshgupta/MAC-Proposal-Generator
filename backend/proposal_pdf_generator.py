@@ -17,8 +17,8 @@ def find_and_replace_text(input_pdf_path, output_pdf_path, add_text):
     
     #x0, y0, x1, y1 = 50,762,276,800
     #page_.insert_textbox(fitz.Rect(x0, y0, x1, y1), add_text, fontsize=14, fontname="F0", align=fitz.TEXT_ALIGN_LEFT)
-    doc.save(output_pdf_path)
     doc.subset_fonts()
+    doc.save(output_pdf_path, garbage=4, deflate=True, clean=True)
     doc.close()
     print(f"Text replacement complete. Output saved to {output_pdf_path}")
 
