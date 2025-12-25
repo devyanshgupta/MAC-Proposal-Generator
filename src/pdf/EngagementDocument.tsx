@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const formatCurrency = (value: number) => `₹${value.toLocaleString("en-IN")}`;
+const formatCurrency = (value: number) => value.toLocaleString("en-IN");
 
 type ProposalDocumentProps = {
   data: ProposalResponse;
@@ -266,7 +266,7 @@ export const ProposalDocument = ({ data, termsAndConditions, advancedTermsAndCon
               <View style={styles.tableHeaderRow}>
                 <Text style={styles.snoHeader}>S.No.</Text>
                 <Text style={styles.scopeHeader}>Scope of Work</Text>
-                <Text style={styles.priceHeader}>Professional Fees (in INR)</Text>
+                <Text style={styles.priceHeader}>Professional Fees (In INR)</Text>
               </View>
 
               {categoryServices.map((svc, idx) => {
