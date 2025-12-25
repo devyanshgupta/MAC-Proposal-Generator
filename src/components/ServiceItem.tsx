@@ -9,9 +9,10 @@ type ServiceItemProps = Omit<ServiceItemData, 'price'> & {
   isSelected: boolean;
   onToggle: () => void;
   onCustomPriceChange: (price: number) => void;
+  scopeOfWork?: string;
 };
 
-export const ServiceItem = ({ service, price, originalPrice, billingCycle, isSelected, onToggle, onCustomPriceChange }: ServiceItemProps) => {
+export const ServiceItem = ({ service, price, originalPrice, billingCycle, isSelected, onToggle, onCustomPriceChange, scopeOfWork }: ServiceItemProps) => {
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPrice = parseFloat(e.target.value);
     if (!isNaN(newPrice)) {
@@ -36,9 +37,14 @@ export const ServiceItem = ({ service, price, originalPrice, billingCycle, isSel
       <span className="mt-2 w-1.5 h-1.5 rounded-full bg-muted-foreground/40 shrink-0" />
       
       {/* Service description */}
-      <p className="flex-1 text-foreground/80 text-base md:text-lg leading-relaxed group-hover:text-foreground transition-colors">
-        {service}
-      </p>
+      <div className="flex-1">
+        <p className="text-foreground/80 text-base md:text-lg leading-relaxed group-hover:text-foreground transition-colors">
+          {service}
+        </p>
+        {scopeOfWork && (
+          <p className="text-sm text-muted-foreground mt-1">{scopeOfWork}</p>
+        )}
+      </div>
       
       {/* Checkbox */}
       <button

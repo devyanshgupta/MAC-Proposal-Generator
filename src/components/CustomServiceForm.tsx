@@ -13,6 +13,7 @@ interface CustomServiceFormProps {
 
 export const CustomServiceForm = ({ categories, billingCycles, onAddService }: CustomServiceFormProps) => {
   const [service, setService] = useState("");
+  const [scopeOfWork, setScopeOfWork] = useState("");
   const [price, setPrice] = useState<number | "">("");
   const [billingCycle, setBillingCycle] = useState<string>('One-off');
   const [category, setCategory] = useState("");
@@ -44,6 +45,7 @@ export const CustomServiceForm = ({ categories, billingCycles, onAddService }: C
     const newService: ServiceItem = {
       id: `custom-${Date.now()}`, // Add a unique ID for custom services
       service,
+      scopeOfWork,
       price: Number(price),
       billingCycle: finalBillingCycle as ServiceItem['billingCycle'],
       category: finalCategory,
@@ -53,6 +55,7 @@ export const CustomServiceForm = ({ categories, billingCycles, onAddService }: C
 
     // Reset form
     setService("");
+    setScopeOfWork("");
     setPrice("");
     setCategory("");
     setNewCategory("");
@@ -149,6 +152,17 @@ export const CustomServiceForm = ({ categories, billingCycles, onAddService }: C
             value={service}
             onChange={(e) => setService(e.target.value)}
             required
+            className="h-24"
+          />
+        </div>
+
+        {/* Scope of Work */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-foreground">Scope of Work</label>
+          <Textarea
+            placeholder="e.g., A detailed description of the work to be done."
+            value={scopeOfWork}
+            onChange={(e) => setScopeOfWork(e.target.value)}
             className="h-24"
           />
         </div>

@@ -15,6 +15,7 @@ class Service(BaseModel):
     service: str
     price: float
     billingCycle: str
+    scopeOfWork: Optional[str] = None
 
 
 class ProposalService(BaseModel):
@@ -23,6 +24,7 @@ class ProposalService(BaseModel):
     service: str
     billingCycle: str
     price: float
+    scopeOfWork: Optional[str] = None
     discountedPrice: Optional[float] = None
 
 
@@ -66,13 +68,15 @@ app.add_middleware(
 @app.get("/api/services")
 def get_services():
     df = pd.read_csv(csv_path)
+    df.fillna("", inplace=True)
     index = []
     for i, row_data in df.iterrows():
         index.append(f"{row_data['category'][0:3].lower()}-{i + 1}")
     df["id"] = index
     columns_in_order = ["id"]
     for i in df.columns:
-        columns_in_order.append(i)
+        if i != "id":
+            columns_in_order.append(i)
     df = df[columns_in_order]
     return df.to_dict(orient="records")
 
@@ -86,6 +90,7 @@ def add_service(service: Service):
         "service": service.service,
         "price": service.price,
         "billingCycle": service.billingCycle,
+        "scopeOfWork": service.scopeOfWork,
     }
     df = df._append(new_service, ignore_index=True)
     df.to_csv(csv_path, index=False)
@@ -110,6 +115,7 @@ def build_proposal(payload: ProposalPayload):
                 "service": svc.service,
                 "billingCycle": svc.billingCycle,
                 "price": svc.price,
+                "scopeOfWork": svc.scopeOfWork,
                 "discountedPrice": svc.discountedPrice,
                 "finalPrice": final_price,
             }

@@ -193,6 +193,7 @@ export const ServiceSelector = () => {
         service: svc.service,
         billingCycle: svc.billingCycle,
         price: svc.price,
+        scopeOfWork: svc.scopeOfWork,
         discountedPrice: customPrices[svc.id] ?? svc.price,
       })),
     };
@@ -366,6 +367,7 @@ export const ServiceSelector = () => {
                           id={service.id}
                           category={service.category}
                           service={service.service}
+                          scopeOfWork={service.scopeOfWork}
                           price={customPrices[service.id] ?? service.price}
                           originalPrice={service.price}
                           billingCycle={service.billingCycle}

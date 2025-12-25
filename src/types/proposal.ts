@@ -4,6 +4,7 @@ export interface ProposalService {
   service: string;
   billingCycle: string;
   price: number;
+  scopeOfWork?: string;
   discountedPrice?: number | null;
   finalPrice?: number;
 }

@@ -67,6 +67,11 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: "#e5e7eb",
   },
+  scopeOfWork: {
+    fontSize: 8,
+    color: "#6b7280", // gray-500
+    marginTop: 2,
+  },
   cellLast: {
     borderRightWidth: 0,
   },
@@ -181,7 +186,12 @@ export const ProposalDocument = ({ data }: ProposalDocumentProps) => {
                 return (
                   <View key={svc.id} style={styles.tableRow}>
                     <View style={{ width: "50%" }}>
-                      <Text style={styles.cell}>{svc.service}</Text>
+                      <View style={styles.cell}>
+                        <Text>{svc.service}</Text>
+                        {svc.scopeOfWork && (
+                          <Text style={styles.scopeOfWork}>{svc.scopeOfWork}</Text>
+                        )}
+                      </View>
                     </View>
                     <View style={{ width: "25%" }}>
                       <Text style={styles.cell}>{currency(svc.price)}</Text>
