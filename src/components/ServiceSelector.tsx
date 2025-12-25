@@ -358,6 +358,7 @@ export const ServiceSelector = () => {
                       >
                         <ServiceItem
                           id={service.id}
+                          category={service.category}
                           service={service.service}
                           price={customPrices[service.id] ?? service.price}
                           originalPrice={service.price}
