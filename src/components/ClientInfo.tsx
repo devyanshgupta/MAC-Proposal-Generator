@@ -25,7 +25,7 @@ export const ClientInfo = ({
     <motion.div
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="bg-background border-b border-border"
+      className="bg-background border-b border-border top-[80px] z-50"
     >
       <div className="max-w-7xl mx-auto px-6 py-6">
         <h2 className="text-2xl font-bold text-foreground mb-6">Client Details</h2>

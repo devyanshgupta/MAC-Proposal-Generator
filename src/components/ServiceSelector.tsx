@@ -104,12 +104,22 @@ export const ServiceSelector = () => {
 
   const scrollToCategory = (index: number) => {
     const ref = categoryRefs.current[index];
-    if (!ref) return;
+    if (!ref || !contentRef.current) return;
 
     setActiveCategory(index);
     isScrollingRef.current = true;
 
-    ref.scrollIntoView({ behavior: "smooth", block: "start" });
+    // Get the header height (sticky header at top) - header is 80px based on h-[calc(100vh-80px)]
+    const headerHeight = 80;
+    const elementTop = ref.offsetTop;
+    const scrollContainer = contentRef.current;
+    
+    // Scroll to position accounting for header, with a small additional offset for spacing
+    const offset = headerHeight + 16; // 16px additional spacing
+    scrollContainer.scrollTo({
+      top: Math.max(0, elementTop - offset),
+      behavior: "smooth"
+    });
 
     setTimeout(() => {
       isScrollingRef.current = false;
@@ -355,7 +365,7 @@ export const ServiceSelector = () => {
               <div
                 key={category}
                 ref={el => categoryRefs.current[allCategories.indexOf(category)] = el}
-                className="mb-16"
+                className="mb-16 scroll-mt-24"
               >
                 <motion.h2 
                   className="md:hidden text-2xl font-bold text-foreground mb-6 sticky top-0 bg-background/95 backdrop-blur-sm py-3 -mx-6 px-6 border-b border-border"
