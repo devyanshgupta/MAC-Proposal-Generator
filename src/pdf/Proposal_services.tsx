@@ -16,12 +16,31 @@ Font.register({
   ]
 });
 
+Font.register({
+  family: 'Open Sauce',
+  fonts: [
+    { src: '/fonts/open-sauce/OpenSauceOne-Bold.ttf', fontWeight: 'bold' },
+    { src: '/fonts/open-sauce/OpenSauceOne-Regular.ttf', fontWeight: 'normal' },
+  ]
+});
+
+Font.register({
+  family: 'Red Hat Display',
+  fonts: [
+    { src: '/fonts/Red_Hat_Display/static/RedHatDisplay-Bold.ttf', fontWeight: 'bold' },
+  ]
+});
+
+
+
 const styles = StyleSheet.create({
   page: {
     padding: 50,
     fontSize: 11,
-    fontFamily: "HK Grotesk",
+    fontFamily: "Open Sauce",
+    fontStyle: 'normal',
     color: "#1f2937",
+    backgroundColor:"#EDEDED",
     lineHeight: 1.5,
   },
   headerContainer: {
@@ -39,12 +58,13 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 14,
+    fontFamily: "Open Sauce",
     fontWeight: "bold",
     color: "#1f2937",
   },
   divider: {
     borderBottomWidth: 2,
-    borderBottomColor: "#6b7280",
+    borderBottomColor: "#000",
     marginBottom: 20,
   },
   mainContainer: {
@@ -52,8 +72,8 @@ const styles = StyleSheet.create({
   },
   verticalTitleContainer: {
     width: 80,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
     flexShrink: 0,
     paddingVertical: 20,
     position: "relative",
@@ -62,22 +82,22 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 600,
     height: 80,
-    left: -300,
-    top: "50%",
-    marginTop: -40,
-    justifyContent: "center",
-    alignItems: "center",
+    left: -295,
+    top: 330,
+    fontFamily: "Atkinson Hyperlegible",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
   },
   verticalTitle: {
-    fontSize: 65,
+    fontSize: 68,
     fontWeight: "bold",
     fontFamily: "Atkinson Hyperlegible",
-    color: "#1f2937",
+    color: "#244333",
     textAlign: "center",
     transform: "rotate(-90deg)",
     transformOrigin: "center center",
     whiteSpace: "nowrap",
-    letterSpacing: 0,
+    letterSpacing: -3,
   },
   servicesContainer: {
     flex: 1,
@@ -88,8 +108,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-start",
     paddingVertical: 12,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#d1d5db",
+    borderBottomWidth: 1.5,
+    borderBottomColor: "#000",
   },
   serviceDetails: {
     flex: 1,
@@ -98,12 +118,14 @@ const styles = StyleSheet.create({
   serviceHeading: {
     fontSize: 12,
     fontWeight: "bold",
+    fontFamily: "Open Sauce",
     marginBottom: 4,
-    color: "#1f2937",
+    color: "#000",
   },
   serviceDescription: {
     fontSize: 10,
-    color: "#6b7280",
+    fontFamily: "Open Sauce",
+    color: "#000",
     lineHeight: 1.4,
   },
   pricingContainer: {
@@ -113,13 +135,15 @@ const styles = StyleSheet.create({
   },
   serviceFee: {
     fontSize: 16,
+    fontFamily: "Red Hat Display",
     fontWeight: "bold",
-    color: "#1f2937",
+    color: "#244333",
     marginBottom: 2,
   },
   paymentCycle: {
     fontSize: 9,
-    color: "#6b7280",
+    fontFamily: "Open Sauce",
+    color: "#000",
   },
 });
 
