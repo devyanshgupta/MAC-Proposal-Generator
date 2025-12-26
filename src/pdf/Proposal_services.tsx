@@ -20,14 +20,14 @@ Font.register({
   family: 'Open Sauce',
   fonts: [
     { src: '/fonts/open-sauce/OpenSauceOne-Bold.ttf', fontWeight: 'bold' },
-    { src: '/fonts/open-sauce/OpenSauceOne-Regular.ttf', fontWeight: 'normal' },
+    { src: '/fonts/open-sauce/OpenSauceTwo-Regular.ttf', fontWeight: 'normal' },
   ]
 });
 
 Font.register({
   family: 'Red Hat Display',
   fonts: [
-    { src: '/fonts/Red_Hat_Display/static/RedHatDisplay-Bold.ttf', fontWeight: 'bold' },
+    { src: 'fonts/Red_Hat_Display/static/RedHatDisplay-Black.ttf', fontWeight: 'bold' },
   ]
 });
 
@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
     fontFamily: "Open Sauce",
     fontStyle: 'normal',
     color: "#1f2937",
+    letterSpacing: 0,
     backgroundColor:"#EDEDED",
     lineHeight: 1.5,
   },
@@ -60,7 +61,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Open Sauce",
     fontWeight: "bold",
-    color: "#1f2937",
+    color: "#1f3728",
   },
   divider: {
     borderBottomWidth: 2,
@@ -101,35 +102,39 @@ const styles = StyleSheet.create({
   },
   servicesContainer: {
     flex: 1,
-    paddingLeft: 16,
+    paddingLeft: 0,
   },
   serviceRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
     paddingVertical: 12,
+    paddingLeft:10,
     borderBottomWidth: 1.5,
     borderBottomColor: "#000",
+    //marginLeft: -16,
   },
   serviceDetails: {
     flex: 1,
-    paddingRight: 16,
+    paddingRight: 0,
   },
   serviceHeading: {
     fontSize: 12,
     fontWeight: "bold",
     fontFamily: "Open Sauce",
     marginBottom: 4,
+    letterSpacing: -0.5,
     color: "#000",
   },
   serviceDescription: {
     fontSize: 10,
     fontFamily: "Open Sauce",
     color: "#000",
+    letterSpacing: -0.5,
     lineHeight: 1.4,
   },
   pricingContainer: {
-    width: 120,
+    width: 100,
     textAlign: "right",
     flexShrink: 0,
   },
@@ -138,11 +143,13 @@ const styles = StyleSheet.create({
     fontFamily: "Red Hat Display",
     fontWeight: "bold",
     color: "#244333",
-    marginBottom: 2,
+    letterSpacing: -0.5,
+    marginBottom: 8,
   },
   paymentCycle: {
     fontSize: 9,
     fontFamily: "Open Sauce",
+    letterSpacing: -0.5,
     color: "#000",
   },
 });
@@ -199,7 +206,15 @@ export const ProposalServicesDocument = ({ services }: ProposalServicesDocumentP
               {pageServices.map((service, index) => {
                 const fee = service.discountedPrice ?? service.price;
                 return (
-                  <View key={service.id} style={styles.serviceRow}>
+                  <View
+                    key={service.id}
+                    style={[
+                      styles.serviceRow,
+                      index == pageServices.length-1 && {
+                        borderBottomWidth: 0,
+                      },
+                    ]}
+                  >
                     <View style={styles.serviceDetails}>
                       <Text style={styles.serviceHeading}>{service.service}</Text>
                       {service.scopeOfWork && (
@@ -216,6 +231,8 @@ export const ProposalServicesDocument = ({ services }: ProposalServicesDocumentP
                 );
               })}
             </View>
+
+            
           </View>
         </Page>
       ))}
