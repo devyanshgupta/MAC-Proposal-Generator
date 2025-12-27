@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { pdf } from "@react-pdf/renderer";
+import { PDFDocument } from "pdf-lib";
 import { CategoryHeading } from "./CategoryHeading";
 import { ServiceItem } from "./ServiceItem";
 import { TotalBar } from "./TotalBar";
@@ -34,6 +35,7 @@ export const ServiceSelector = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPreparing, setIsPreparing] = useState(false);
   const [isGeneratingServices, setIsGeneratingServices] = useState(false);
+  const [isGeneratingFinalProposal, setIsGeneratingFinalProposal] = useState(false);
   const [termsAndConditions, setTermsAndConditions] = useState<string[]>([]);
   const [advancedTermsAndConditions, setAdvancedTermsAndConditions] = useState<AdvancedTerm[]>([]);
 
@@ -365,6 +367,89 @@ export const ServiceSelector = () => {
     }
   };
 
+  const handleGenerateFinalProposal = async () => {
+    if (selectedServices.size === 0) {
+      alert("Select at least one service to generate the final proposal.");
+      return;
+    }
+    if (!clientInfo.name || clientInfo.name.trim() === "") {
+      alert("Please enter a client name to generate the final proposal.");
+      return;
+    }
+
+    setIsGeneratingFinalProposal(true);
+    try {
+      // 1. Fetch Cover Letter PDF
+      const coverResponse = await fetch("/api/proposal_letter/details", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(clientInfo),
+      });
+
+      if (!coverResponse.ok) {
+        throw new Error("Failed to generate proposal letter");
+      }
+      const coverBlob = await coverResponse.blob();
+      const coverArrayBuffer = await coverBlob.arrayBuffer();
+
+      // 2. Generate Services PDF
+      const selected = allServices.filter(s => selectedServices.has(s.id));
+      const services: ProposalPayload["services"] = selected.map((svc) => ({
+        id: svc.id,
+        category: svc.category,
+        service: svc.service,
+        billingCycle: svc.billingCycle,
+        price: svc.price,
+        scopeOfWork: svc.scopeOfWork,
+        discountedPrice: customPrices[svc.id] ?? svc.price,
+      }));
+
+      const servicesBlob = await pdf(<ProposalServicesDocument services={services} para={clientInfo.para} />).toBlob();
+      const servicesArrayBuffer = await servicesBlob.arrayBuffer();
+
+      // 3. Fetch End Document
+      const endDocResponse = await fetch("/Proposal_document_end.pdf");
+      if (!endDocResponse.ok) {
+        throw new Error("Failed to fetch end document");
+      }
+      const endDocBlob = await endDocResponse.blob();
+      const endDocArrayBuffer = await endDocBlob.arrayBuffer();
+
+      // 4. Merge PDFs
+      const mergedPdf = await PDFDocument.create();
+
+      const coverDoc = await PDFDocument.load(coverArrayBuffer);
+      const servicesDoc = await PDFDocument.load(servicesArrayBuffer);
+      const endDoc = await PDFDocument.load(endDocArrayBuffer);
+
+      const coverPages = await mergedPdf.copyPages(coverDoc, coverDoc.getPageIndices());
+      coverPages.forEach((page) => mergedPdf.addPage(page));
+
+      const servicesPages = await mergedPdf.copyPages(servicesDoc, servicesDoc.getPageIndices());
+      servicesPages.forEach((page) => mergedPdf.addPage(page));
+
+      const endPages = await mergedPdf.copyPages(endDoc, endDoc.getPageIndices());
+      endPages.forEach((page) => mergedPdf.addPage(page));
+
+      const mergedPdfBytes = await mergedPdf.save();
+      const mergedBlob = new Blob([mergedPdfBytes as BlobPart], { type: "application/pdf" });
+
+      // 5. Download
+      const url = URL.createObjectURL(mergedBlob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Final_Proposal_${clientInfo.name.replace(/\s+/g, "_")}_${clientInfo.date || "today"}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error(error);
+      alert("Unable to generate Final Proposal. Please try again.");
+    } finally {
+      setIsGeneratingFinalProposal(false);
+    }
+  };
+
   const filteredCategories = allCategories.filter(category =>
     getServicesByCategory(category).length > 0
   );
@@ -497,9 +582,11 @@ export const ServiceSelector = () => {
         onGeneratePdf={handleGeneratePdf}
         onPrepareProposal={handlePrepareProposal}
         onGenerateServicesPdf={handleGenerateServicesPdf}
+        onGenerateFinalProposal={handleGenerateFinalProposal}
         isGenerating={isGenerating}
         isPreparing={isPreparing}
         isGeneratingServices={isGeneratingServices}
+        isGeneratingFinalProposal={isGeneratingFinalProposal}
       />
     </div>
   );

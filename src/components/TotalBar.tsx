@@ -9,12 +9,15 @@ interface TotalBarProps {
   isGenerating?: boolean;
   isPreparing?: boolean;
   isGeneratingServices?: boolean;
+  onGenerateFinalProposal?: () => void;
+  isGeneratingFinalProposal?: boolean;
 }
 
-export const TotalBar = ({ total, selectedCount, onGeneratePdf, onPrepareProposal, onGenerateServicesPdf, isGenerating, isPreparing, isGeneratingServices }: TotalBarProps) => {
-  const disabledGenerate = selectedCount === 0 || isGenerating || isPreparing || isGeneratingServices;
-  const disabledPrepare = isGenerating || isPreparing || isGeneratingServices;
-  const disabledServices = selectedCount === 0 || isGenerating || isPreparing || isGeneratingServices;
+export const TotalBar = ({ total, selectedCount, onGeneratePdf, onPrepareProposal, onGenerateServicesPdf, onGenerateFinalProposal, isGenerating, isPreparing, isGeneratingServices, isGeneratingFinalProposal }: TotalBarProps) => {
+  const disabledGenerate = selectedCount === 0 || isGenerating || isPreparing || isGeneratingServices || isGeneratingFinalProposal;
+  const disabledPrepare = isGenerating || isPreparing || isGeneratingServices || isGeneratingFinalProposal;
+  const disabledServices = selectedCount === 0 || isGenerating || isPreparing || isGeneratingServices || isGeneratingFinalProposal;
+  const disabledFinal = selectedCount === 0 || isGenerating || isPreparing || isGeneratingServices || isGeneratingFinalProposal;
 
   return (
     <motion.div
@@ -25,48 +28,59 @@ export const TotalBar = ({ total, selectedCount, onGeneratePdf, onPrepareProposa
       <div className="total-gradient backdrop-blur-lg border-t border-primary/20">
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            {onPrepareProposal && (
-              <button 
+            {/*onPrepareProposal && (
+              <button
                 type="button"
                 onClick={onPrepareProposal}
                 disabled={disabledPrepare}
-                className={`px-6 py-2.5 rounded-lg font-semibold transition-opacity shrink-0 ${
-                  disabledPrepare
+                className={`px-6 py-2.5 rounded-lg font-semibold transition-opacity shrink-0 ${disabledPrepare
                     ? "bg-muted text-muted-foreground cursor-not-allowed"
                     : "bg-primary-foreground text-primary hover:opacity-90"
-                }`}
+                  }`}
               >
                 {isPreparing ? "Preparing..." : "Prepare Proposal"}
               </button>
+            )*/}
+            {onGenerateFinalProposal && (
+              <button
+                type="button"
+                onClick={onGenerateFinalProposal}
+                disabled={disabledFinal}
+                className={`px-6 py-2.5 rounded-lg font-semibold transition-opacity shrink-0 ${disabledFinal
+                    ? "bg-muted text-muted-foreground cursor-not-allowed"
+                    : "bg-primary-foreground text-primary hover:opacity-90"
+                  }`}
+              >
+                {isGeneratingFinalProposal ? "Creating..." : "Generate Proposal Document"}
+              </button>
             )}
-            <button 
+            <button
               type="button"
               onClick={onGeneratePdf}
               disabled={disabledGenerate}
-              className={`px-6 py-2.5 rounded-lg font-semibold transition-opacity shrink-0 ${
-                disabledGenerate
+              className={`px-6 py-2.5 rounded-lg font-semibold transition-opacity shrink-0 ${disabledGenerate
                   ? "bg-muted text-muted-foreground cursor-not-allowed"
                   : "bg-primary-foreground text-primary hover:opacity-90"
-              }`}
+                }`}
             >
               {isGenerating ? "Generating..." : "Generate Engagement Letter"}
             </button>
-            {onGenerateServicesPdf && (
-              <button 
+            {/*onGenerateServicesPdf && (
+              <button
                 type="button"
                 onClick={onGenerateServicesPdf}
                 disabled={disabledServices}
-                className={`px-6 py-2.5 rounded-lg font-semibold transition-opacity shrink-0 ${
-                  disabledServices
+                className={`px-6 py-2.5 rounded-lg font-semibold transition-opacity shrink-0 ${disabledServices
                     ? "bg-muted text-muted-foreground cursor-not-allowed"
                     : "bg-primary-foreground text-primary hover:opacity-90"
-                }`}
+                  }`}
               >
                 {isGeneratingServices ? "Generating..." : "Generate Services PDF"}
               </button>
-            )}
+            )*/}
+            
           </div>
-          
+
           <div className="flex items-center gap-4 ml-auto">
             <AnimatePresence mode="wait">
               <motion.span
@@ -80,7 +94,7 @@ export const TotalBar = ({ total, selectedCount, onGeneratePdf, onPrepareProposa
               </motion.span>
             </AnimatePresence>
           </div>
-          
+
           <div className="flex items-center gap-3 shrink-0">
             <span className="text-primary-foreground/70 text-sm md:text-base font-medium">Total</span>
             <AnimatePresence mode="wait">
