@@ -7,7 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-backend.__pycache__
+backend/__pycache__
 
 node_modules
 dist
@@ -24,6 +24,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# Python cache
-backend/__pycache__
