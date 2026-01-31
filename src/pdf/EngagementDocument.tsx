@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, Font, Image } from "@react-pdf/renderer";
 import { ProposalResponse, AdvancedTerm } from "@/types/engagement";
 
 Font.register({
@@ -26,6 +26,15 @@ const styles = StyleSheet.create({
     fontFamily: "HK Grotesk",
     color: "#1f2937",
     lineHeight: 1.5,
+  },
+  watermark: {
+    position: 'absolute',
+    top: 0,
+    left: 30,
+    width: '90%',
+    height: '100%',
+    zIndex: -1,
+    opacity: 0.15,
   },
   dateRight: {
     textAlign: "right",
@@ -264,7 +273,7 @@ export const ProposalDocument = ({ data, advancedTermsAndConditions }: ProposalD
   const para = data.proposal?.para || ""; // Retrieve the new paragraph field
 
   const entityType = data.client?.entityType;
-  const isProprietorshipOrPartnership = entityType == 'proprietorship'
+  const isProprietorshipOrPartnership = entityType === 'proprietorship';
   const isCompany = !isProprietorshipOrPartnership;
 
   const servicesByCategory = services.reduce((acc, service) => {
@@ -284,6 +293,7 @@ export const ProposalDocument = ({ data, advancedTermsAndConditions }: ProposalD
   return (
     <Document>
       <Page size="A4" style={styles.page}>
+        <Image src="/watermark.png" style={styles.watermark} fixed />
         <Text style={styles.dateRight}>{proposalDate}</Text>
 
         <View style={styles.addressBlock}>
@@ -417,6 +427,7 @@ export const ProposalDocument = ({ data, advancedTermsAndConditions }: ProposalD
       {advancedTermsAndConditions && advancedTermsAndConditions.length > 0 && (
 
         <Page size="A4" style={styles.advancedTermsPage}>
+          <Image src="/watermark.png" style={styles.watermark} fixed />
           <Text style={styles.advancedTermsTitle}>General Terms and Conditions</Text>
           {advancedTermsAndConditions.map((term, index) => {
             const headingText = term.heading.replace(/^\d+\.?\s*/, '');
