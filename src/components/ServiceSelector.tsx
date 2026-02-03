@@ -34,6 +34,7 @@ export const ServiceSelector = () => {
     date: new Date().toISOString().slice(0, 10),
     para: defaultTerms.join("\n"),
     entityType: "company",
+    referenceNumber: "",
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPreparing, setIsPreparing] = useState(false);
@@ -239,6 +240,7 @@ export const ServiceSelector = () => {
         address: clientInfo.address,
         PAN: clientInfo.PAN,
         entityType: clientInfo.entityType as "company" | "proprietorship",
+        referenceNumber: clientInfo.referenceNumber,
       },
       proposal: {
         preparedFor: clientInfo.name || "Client",
@@ -292,6 +294,7 @@ export const ServiceSelector = () => {
           address: clientInfo.address,
           PAN: clientInfo.PAN,
           entityType: clientInfo.entityType as "company" | "proprietorship",
+          referenceNumber: clientInfo.referenceNumber,
         };
       }
 
@@ -526,6 +529,7 @@ export const ServiceSelector = () => {
             greeting={clientInfo.message}
             para={clientInfo.para} // Pass the new paragraph field
             entityType={clientInfo.entityType}
+            referenceNumber={clientInfo.referenceNumber || ""}
             onFieldChange={handleClientFieldChange}
           />
           <div className="md:hidden mb-8">

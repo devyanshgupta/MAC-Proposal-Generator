@@ -30,18 +30,20 @@ Font.registerHyphenationCallback(word => {return [word];});
 
 const styles = StyleSheet.create({
   page: {
-    padding: 50,
+    paddingTop: 50,
+    paddingLeft: 50,
+    paddingRight: 50,
+    paddingBottom: 80,
     fontSize: 11,
     fontFamily: "HK Grotesk",
     color: "#1f2937",
-    lineHeight: 1.5,
   },
   watermark: {
     position: 'absolute',
     top: 0,
-    left: 30,
-    width: '90%',
-    height: '100%',
+    left: 0,
+    width: '100%',
+    height: '110%',
     zIndex: -1,
     opacity: 0.15,
   },
@@ -63,12 +65,13 @@ const styles = StyleSheet.create({
   message: {
     marginBottom: 20,
     textAlign: "justify",
+    lineHeight: 1,
   },
   categoryTitle: {
     fontSize: 12,
     fontWeight: "bold",
     marginTop: 16,
-    marginBottom: 8,
+    marginBottom: 10,
     textDecoration: "underline",
   },
   table: {
@@ -85,6 +88,7 @@ const styles = StyleSheet.create({
   tableRow: {
     flexDirection: "row",
     paddingVertical: 6,
+    marginBottom: 10,
     borderBottomWidth: 0.5,
     borderBottomColor: "#d1d5db",
   },
@@ -183,6 +187,7 @@ const styles = StyleSheet.create({
   },
   signatureLine: {
     marginBottom: 4,
+    lineHeight: 0.75,
   },
   bold: {
     fontWeight: "bold",
@@ -215,11 +220,12 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica",
   },
   advancedTermsPage: {
-    padding: 50,
+    paddingTop: 50,
+    paddingLeft: 50,
+    paddingRight: 50,
+    paddingBottom: 80,
     fontSize: 10,
     fontFamily: "Helvetica",
-    //color: "#1f2937",
-    lineHeight: 1.6,
   },
   advancedTermsTitle: {
     fontSize: 14,
@@ -243,10 +249,18 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     textAlign: "justify",
     paddingLeft: 10,
-    //fontFamily: "Open Sauce",
-    //color: "#000",
-    //letterSpacing: 0,
+    lineHeight: 1,
   },
+  pageNumber: {
+    position: 'absolute',
+    bottom: 30,
+    left: 50,
+    right: 0,
+    zIndex: 10,
+    fontSize: 10,
+    color: '#000', // Changed to black as per user edit for visibility
+    textAlign: 'left',
+  }
 });
 
 const formatCurrency = (value: number) => value.toLocaleString("en-IN");
@@ -312,10 +326,59 @@ export const ProposalDocument = ({ data, advancedTermsAndConditions }: ProposalD
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <Image src="/watermark.png" style={styles.watermark} fixed />
+        {/* Background layers - letterhead (page 1 only) + watermark (all pages) */}
+        <View
+          fixed
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '118.2%', //dont change this
+          }}
+          render={({ pageNumber }) => (
+            <>
+              {/* Letterhead - only on page 1, rendered first (bottom layer) */}
+              {pageNumber === 1 && (
+                <Image src="/letterhead.png" style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%'
+                }} />
+              )}
+              {/* Watermark - on all pages, rendered second (on top of letterhead) */}
+              <Image src="/watermark.png" style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '110%',
+                opacity: 0.15
+              }} />
+            </>
+          )}
+        />
+
+        {/* Page Numbers */}
+        <Text
+          fixed
+          style={styles.pageNumber}
+          render={({ pageNumber, totalPages }) => (
+            pageNumber > 1 ? `Page ${pageNumber} of ${totalPages}` : ''
+          )}
+        />
+
+        {/* Spacer for top margin on first page. Increase height to push text lower on page 1. */}
+        <View style={{ height: 120 }} />
+
         <Text style={styles.dateRight}>{proposalDate}</Text>
 
         <View style={styles.addressBlock}>
+          {data.client?.referenceNumber && (
+            <Text style={{ marginBottom: 4, fontWeight: 'bold' }}>Reference Number: {data.client.referenceNumber}</Text>
+          )}
           <Text>To,</Text>
           {isCompany && <Text style={styles.bold}>The Board of Directors</Text>}
           <Text style={styles.bold}>{clientName}</Text>
@@ -332,7 +395,6 @@ export const ProposalDocument = ({ data, advancedTermsAndConditions }: ProposalD
         <Text style={styles.salutation}>Sir,</Text>
 
         <Text style={styles.message}>{sanitizeText(message)}</Text>
-        {para && <Text style={styles.message}>{sanitizeText(para)}</Text>} {/* Display the new paragraph if it exists */}
 
         {Object.entries(servicesByCategory).map(([category, categoryServices]) => (
           <View key={category}>
@@ -402,25 +464,26 @@ export const ProposalDocument = ({ data, advancedTermsAndConditions }: ProposalD
           })}
         </View>
 
-        <Text style={{ marginTop: 16, marginBottom: 40 }}>
+        <Text style={{ marginTop: 7, marginBottom: 10 }}>
           Please send us signed copy of this Engagement Letter as a token of your acceptance. You may also sign it digitally.
         </Text>
 
         <View style={styles.signatureContainer} wrap={false}>
           {/* Left Block - CA Mayur Gupta */}
           <View style={styles.signatureBlock}>
-            <View style={{ borderTop: '1px solid #333', width: '100%', marginTop: 80, marginBottom: 10 }} />
-            <Text style={[styles.signatureLine, styles.bold]}>CA MAYUR GUPTA, FCA</Text>
-            <Text style={styles.signatureLine}>PROPRIETOR</Text>
-            <Text style={[styles.signatureLine, styles.bold]}>FOR MAYUR AND COMPANY</Text>
-            <Text style={styles.signatureLine}>CHARTERED ACCOUNTANTS</Text>
-            <Text style={styles.signatureLine}>DATE – {proposalDate}</Text>
-            <Text style={styles.signatureLine}>PLACE: DELHI</Text>
+            <View style={{ borderTop: '1px solid #333', width: '100%', marginTop: 20, marginBottom: 5 }} />
+            <Text style={[styles.signatureLine, styles.bold]}>CA MAYUR GUPTA</Text>
+            <Text style={styles.signatureLine}>Proprietor</Text>
+            <Text style={[styles.signatureLine, styles.bold]}>Mayur and Company</Text>
+            <Text style={styles.signatureLine}>Chartered Accountants</Text>
+            <Text style={styles.signatureLine}>Date – {proposalDate}</Text>
+            <Text style={styles.signatureLine}>Place: Delhi</Text>
+            <Text style={styles.enclosure}>Enc.: a/a</Text>
           </View>
 
           {/* Right Block - Client */}
           <View style={styles.signatureBlock}>
-            <View style={{ borderTop: '1px solid #333', width: '100%', marginTop: 80, marginBottom: 10 }} />
+            <View style={{ borderTop: '1px solid #333', width: '100%', marginTop: 20, marginBottom: 5 }} />
             {isCompany ? (
               <>
                 {clientRepresentative ? <Text style={styles.signatureLine}>{clientRepresentative}</Text> : null}
@@ -440,13 +503,35 @@ export const ProposalDocument = ({ data, advancedTermsAndConditions }: ProposalD
             {clientPhone && <Text style={styles.signatureLine}>Phone: {clientPhone}</Text>}
           </View>
         </View>
-        <Text style={styles.enclosure}>Enc.: a/a</Text>
       </Page>
 
       {advancedTermsAndConditions && advancedTermsAndConditions.length > 0 && (
 
         <Page size="A4" style={styles.advancedTermsPage}>
-          <Image src="/watermark.png" style={styles.watermark} fixed />
+          {/* Watermark - zIndex -5 */}
+          <View
+            fixed
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: -5,
+            }}
+          >
+            <Image src="/watermark.png" style={{ width: '100%', height: '100%', opacity: 0.15 }} />
+          </View>
+
+          {/* Page Numbers */}
+          <Text
+            fixed
+            style={styles.pageNumber}
+            render={({ pageNumber, totalPages }) => (
+              pageNumber > 1 ? `Page ${pageNumber} of ${totalPages}` : ''
+            )}
+          />
+
           <Text style={styles.advancedTermsTitle}>General Terms and Conditions</Text>
           {advancedTermsAndConditions.map((term, index) => {
             const headingText = term.heading.replace(/^\d+\.?\s*/, '');

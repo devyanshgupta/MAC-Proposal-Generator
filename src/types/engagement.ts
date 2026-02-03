@@ -19,6 +19,7 @@ export interface ClientInfo {
   address?: string;
   PAN?: string;
   entityType?: 'company' | 'proprietorship';
+  referenceNumber?: string;
 }
 
 export interface ProposalMeta {

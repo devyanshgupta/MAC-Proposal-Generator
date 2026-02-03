@@ -14,6 +14,7 @@ interface ClientInfoProps {
   greeting: string;
   entityType?: string;
   para: string; // Added new field for paragraph
+  referenceNumber: string;
   onFieldChange: (field: string, value: string) => void;
 }
 
@@ -30,6 +31,7 @@ export const ClientInfo = ({
   greeting,
   entityType = "company",
   para, // Added new field for paragraph
+  referenceNumber,
   onFieldChange,
 }: ClientInfoProps) => {
   return (
@@ -135,6 +137,20 @@ export const ClientInfo = ({
               placeholder="Enter Email"
               value={email}
               onChange={(e) => onFieldChange("email", e.target.value)}
+              className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="reference-number" className="text-sm font-medium text-foreground/70 mb-2">
+              Reference Number
+            </label>
+            <input
+              id="reference-number"
+              type="text"
+              placeholder="Enter Reference Number"
+              value={referenceNumber}
+              onChange={(e) => onFieldChange("referenceNumber", e.target.value)}
               className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
             />
           </div>
