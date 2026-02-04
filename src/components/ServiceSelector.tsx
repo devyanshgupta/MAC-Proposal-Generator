@@ -306,20 +306,22 @@ export const ServiceSelector = () => {
       }
 
       // Generate the initial PDF
-      const blob = await pdf(<ProposalDocument data={normalized} advancedTermsAndConditions={advancedTermsAndConditions} />).toBlob();
+      const blob = await pdf(<ProposalDocument data={normalized} />).toBlob();
 
-      // Post-process with Ghostscript to make text unselectable
+      // Send to backend for finalization (append terms, add page numbers, add signature, secure)
       const formData = new FormData();
       formData.append('pdf_file', blob, `proposal-${payload.proposal.date || "today"}.pdf`);
+      formData.append('client_details', JSON.stringify(clientInfo));
 
-      const secureResponse = await fetch("/api/secure-pdf", {
+      const secureResponse = await fetch("/api/proposal/finalize", {
         method: "POST",
         body: formData,
       });
 
       if (!secureResponse.ok) {
-        throw new Error("Failed to process PDF for security");
+        throw new Error("Failed to finalize PDF");
       }
+
 
       const secureBlob = await secureResponse.blob();
       const url = URL.createObjectURL(secureBlob);

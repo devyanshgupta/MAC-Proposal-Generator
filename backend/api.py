@@ -4,11 +4,11 @@ import tempfile
 import subprocess
 import pandas as pd
 import uvicorn
-from fastapi import FastAPI, BackgroundTasks, UploadFile, File
+from fastapi import FastAPI, BackgroundTasks, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from backend.proposal_pdf_generator import find_and_replace_text, normalize_path
+from backend.proposal_pdf_generator import find_and_replace_text, normalize_path, finalize_proposal
 
 
 class Service(BaseModel):
@@ -253,6 +253,55 @@ async def make_pdf_secure(
             os.unlink(output_path)
         raise e
 
+
+@app.post("/api/proposal/finalize")
+async def finalize_proposal_endpoint(
+    pdf_file: UploadFile = File(...),
+    client_details: str = Form(...),
+    background_tasks: BackgroundTasks = None
+):
+    """
+    Finalize the proposal: match inputs, add terms, add page numbers, add signature, secure.
+    """
+    import json
+    try:
+        details = json.loads(client_details)
+    except json.JSONDecodeError:
+        raise ValueError("Invalid client_details JSON")
+
+    # Create temporary files
+    input_temp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+    output_temp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+    input_path = input_temp.name
+    output_path = output_temp.name
+    input_temp.close()
+    output_temp.close()
+
+    try:
+        # Write uploaded PDF to temporary file
+        content = await pdf_file.read()
+        
+        # Call the generator logic
+        finalize_proposal(content, details, output_path)
+        
+        # Schedule cleanup
+        if background_tasks:
+            background_tasks.add_task(cleanup_temp_file, input_path)
+            background_tasks.add_task(cleanup_temp_file, output_path)
+        
+        # Return the processed PDF
+        return FileResponse(
+            output_path,
+            media_type="application/pdf",
+            filename=f"final_proposal.pdf"
+        )
+    except Exception as e:
+        # Clean up on error
+        if os.path.exists(input_path):
+            os.unlink(input_path)
+        if os.path.exists(output_path):
+            os.unlink(output_path)
+        raise e
 
 if __name__ == "__main__":
     uvicorn.run("api:app", host="0.0.0.0", port=8000)# Trigger reload

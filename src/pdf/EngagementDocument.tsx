@@ -1,8 +1,9 @@
 import { Document, Page, Text, View, StyleSheet, Font, Image } from "@react-pdf/renderer";
 import { ProposalResponse, AdvancedTerm } from "@/types/engagement";
 
+
 Font.register({
-  family: 'HK Grotesk',
+  family: "HK Grotesk",
   fonts: [
     { src: '/fonts/hk-grotesk/HKGrotesk-Regular.otf', fontWeight: 'normal' },
     { src: '/fonts/hk-grotesk/HKGrotesk-Bold.otf', fontWeight: 'bold' },
@@ -26,7 +27,7 @@ Font.register({
 });
 
 
-Font.registerHyphenationCallback(word => {return [word];});
+Font.registerHyphenationCallback(word => { return [word]; });
 
 const styles = StyleSheet.create({
   page: {
@@ -201,7 +202,7 @@ const styles = StyleSheet.create({
   enclosureHindi: {
     fontFamily: "Noto Serif Devanagari",
     fontWeight: "normal",
-    fontSize:12,
+    fontSize: 12,
     wordBreak: 'keep-all',
     lineHeight: 1.2,
   },
@@ -251,16 +252,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     lineHeight: 1,
   },
-  pageNumber: {
-    position: 'absolute',
-    bottom: 30,
-    left: 50,
-    right: 0,
-    zIndex: 10,
-    fontSize: 10,
-    color: '#000', // Changed to black as per user edit for visibility
-    textAlign: 'left',
-  }
 });
 
 const formatCurrency = (value: number) => value.toLocaleString("en-IN");
@@ -277,7 +268,7 @@ const sanitizeText = (text: string): string => {
 
 type ProposalDocumentProps = {
   data: ProposalResponse;
-  advancedTermsAndConditions?: AdvancedTerm[];
+  // advancedTermsAndConditions is no longer used here, it's appended by backend
 };
 
 
@@ -287,7 +278,7 @@ export const defaultTerms = [
   "General Terms and Conditions of Mayur & Company, attached herewith, shall apply."
 ];
 
-export const ProposalDocument = ({ data, advancedTermsAndConditions }: ProposalDocumentProps) => {
+export const ProposalDocument = ({ data }: ProposalDocumentProps) => {
   const services = data.services ?? [];
   const clientName = data.client?.name || "Client Name";
   const clientRepresentative = data.client?.clientRepresentative || "";
@@ -361,14 +352,7 @@ export const ProposalDocument = ({ data, advancedTermsAndConditions }: ProposalD
           )}
         />
 
-        {/* Page Numbers */}
-        <Text
-          fixed
-          style={styles.pageNumber}
-          render={({ pageNumber, totalPages }) => (
-            pageNumber > 1 ? `Page ${pageNumber} of ${totalPages}` : ''
-          )}
-        />
+
 
         {/* Spacer for top margin on first page. Increase height to push text lower on page 1. */}
         <View style={{ height: 120 }} />
@@ -410,7 +394,7 @@ export const ProposalDocument = ({ data, advancedTermsAndConditions }: ProposalD
                 const hasLowerPrice = svc.discountedPrice != null && svc.discountedPrice !== svc.price && svc.discountedPrice < svc.price;
                 const hasHigherPrice = svc.discountedPrice != null && svc.discountedPrice !== svc.price && svc.discountedPrice > svc.price;
                 return (
-                  <View key={svc.id} style={styles.tableRow} wrap={false}>
+                  <View key={svc.id} style={styles.tableRow}>
                     <View style={styles.snoCell}>
                       <Text style={styles.snoText}>{idx + 1}.</Text>
                     </View>
@@ -505,87 +489,7 @@ export const ProposalDocument = ({ data, advancedTermsAndConditions }: ProposalD
         </View>
       </Page>
 
-      {advancedTermsAndConditions && advancedTermsAndConditions.length > 0 && (
 
-        <Page size="A4" style={styles.advancedTermsPage}>
-          {/* Watermark - zIndex -5 */}
-          <View
-            fixed
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              zIndex: -5,
-            }}
-          >
-            <Image src="/watermark.png" style={{ width: '100%', height: '100%', opacity: 0.15 }} />
-          </View>
-
-          {/* Page Numbers */}
-          <Text
-            fixed
-            style={styles.pageNumber}
-            render={({ pageNumber, totalPages }) => (
-              pageNumber > 1 ? `Page ${pageNumber} of ${totalPages}` : ''
-            )}
-          />
-
-          <Text style={styles.advancedTermsTitle}>General Terms and Conditions</Text>
-          {advancedTermsAndConditions.map((term, index) => {
-            const headingText = term.heading.replace(/^\d+\.?\s*/, '');
-            const toRoman = (num) => {
-              const romans = [
-                'i', 'ii', 'iii', 'iv', 'v',
-                'vi', 'vii', 'viii', 'ix', 'x',
-                'xi', 'xii', 'xiii', 'xiv', 'xv',
-                'xvi', 'xvii', 'xviii', 'xix', 'xx',
-              ];
-              return romans[num - 1] || num.toString();
-            };
-            return (
-              <View key={index} style={styles.advancedTermBlock}>
-                <Text style={styles.advancedTermHeading}>{`${index + 1}. ${sanitizeText(headingText)}`}</Text>
-                {term.points.map((point, pointIndex) => (
-                  <Text key={pointIndex} style={styles.advancedTermPointer}>
-                    {term.points.length === 1 ? sanitizeText(point) : `${toRoman(pointIndex + 1)}. ${sanitizeText(point)}`}
-                  </Text>
-                ))}
-              </View>
-            );
-          })}
-          <Text style={styles.enclosure}>
-            <Text style={styles.bold}>Note:</Text> Clients are hereby informed that they may formally request a translation of the General Terms & Conditions into Hindi language if required. Such requests will be accommodated to the extent feasible, subject to the company’s standard procedures and timelines. In the event of any inconsistencies or ambiguities between the translated General Terms & Conditions and the English version, the English version shall prevail and be deemed authoritative.{'\n\n'}</Text>
-            <Text style={styles.enclosureHindi}>
-            <Text style={styles.boldHindi}>नोट:</Text> ग्राहकों को एतद्द्वारा सूचित किया जाता है कि वे आवश्यकता होने पर सामान्य नियम और शर्तों के हिंदी अनुवाद के लिए औपचारिक रूप से अनुरोध कर सकते हैं। ऐसे अनुरोधों को कंपनी की मानक प्रक्रियाओं और समय-सीमाओं के अधीन, यथासंभव पूरा किया जाएगा। अनुवादित सामान्य नियम और शर्तों में किसी भी प्रकार की विसंगति होने की स्थिति में, अंग्रेजी संस्करण  ही सर्वोपरि माना जाएगा।</Text>
-            <Text style={styles.enclosure}>I hereby confirm that I have read all the above-mentioned General Terms and Conditions of Mayur and Company, Chartered Accountants and agree and accept all the above-mentioned General Terms and Conditions of Mayur and Company, Chartered Accountants.</Text>
-
-          <View style={styles.signatureContainer} wrap={false}>
-            {/* Right Block - Client */}
-            <View style={styles.signatureBlock}>
-              <View style={{ borderTop: '1px solid #333', width: '100%', marginTop: 80, marginBottom: 10 }} />
-              {isCompany ? (
-                <>
-                  {clientRepresentative ? <Text style={styles.signatureLine}>{clientRepresentative}</Text> : null}
-                  {clientRepresentativePost ? <Text style={styles.signatureLine}>{clientRepresentativePost}</Text> : null}
-                  <Text style={[styles.signatureLine, styles.bold]}>For and on behalf of</Text>
-                  <Text style={[styles.signatureLine, styles.bold]}>The Board of Directors</Text>
-                  <Text style={[styles.signatureLine, styles.bold]}>{clientName}</Text>
-                  <Text style={styles.signatureLine}>Authorized Signatory</Text>
-                </>
-              ) : (
-                <Text style={[styles.signatureLine, styles.bold]}>{clientName}</Text>
-              )}
-              {PAN && <Text style={styles.signatureLine}>PAN - {PAN}</Text>}
-              <Text style={styles.signatureLine}>Date – {proposalDate}</Text>
-              {address && <Text style={styles.signatureLine}>Address: {address}</Text>}
-              {clientEmail && <Text style={styles.signatureLine}>Email: {clientEmail}</Text>}
-              {clientPhone && <Text style={styles.signatureLine}>Phone: {clientPhone}</Text>}
-            </View>
-          </View>
-        </Page>
-      )}
     </Document>
   );
 };
