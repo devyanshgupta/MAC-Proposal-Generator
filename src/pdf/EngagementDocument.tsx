@@ -364,7 +364,9 @@ export const ProposalDocument = ({ data }: ProposalDocumentProps) => {
             <Text style={{ marginBottom: 4, fontWeight: 'bold' }}>Reference Number: {data.client.referenceNumber}</Text>
           )}
           <Text>To,</Text>
-          {isCompany && <Text style={styles.bold}>The Board of Directors</Text>}
+          {/*isCompany && <Text style={styles.bold}>The Board of Directors</Text>*/}
+          {clientRepresentative ? <Text style={styles.bold}>{clientRepresentative}</Text> : null}
+          {clientRepresentativePost ? <Text style={styles.bold}>{clientRepresentativePost}</Text> : null}
           <Text style={styles.bold}>{clientName}</Text>
           {clientEmail && <Text>Email: {clientEmail}</Text>}
           {clientPhone && <Text>Phone: {clientPhone}</Text>}

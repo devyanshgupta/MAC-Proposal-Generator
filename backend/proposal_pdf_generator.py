@@ -119,7 +119,7 @@ def finalize_proposal(input_pdf_bytes, params, output_pdf_path):
     # Left Block (CA)
     left_x = 50
     # Right Block (Client)
-    right_x = 300
+    right_x = 50 #change to 300 if this to be on left
     
     last_page.insert_font(fontname='HKBold', fontfile=normalize_path("public/fonts/hk-grotesk/HKGrotesk-Bold.otf"))
     last_page.insert_font(fontname='HKRegular', fontfile=font_path)
@@ -159,9 +159,51 @@ def finalize_proposal(input_pdf_bytes, params, output_pdf_path):
         
     if pan: y_r = draw_text(last_page, right_x, y_r, f"PAN - {pan}")
     y_r = draw_text(last_page, right_x, y_r, f"Date – {proposal_date}")
-    if address: y_r = draw_text(last_page, right_x, y_r, f"Address: {address}")
+
+    is_multiline_address = False
+
+    if address:
+        if len(address) > 90:
+            is_multiline_address = True
+            y_r = draw_text(last_page, right_x, y_r, "Address:")
+
+            words = address.split()
+            line = ""
+            first_line = True
+
+            for word in words:
+                # Check if adding next word exceeds 80 chars
+                if len(line) + len(word) + 1 > 80:
+                    if first_line:
+                        y_r = draw_text(last_page, right_x, y_r, f"Address: {line}")
+                        first_line = False
+                    else:
+                        y_r = draw_text(last_page, right_x, y_r, line)
+                    line = word  # start new line with current word
+                else:
+                    if line:
+                        line += " " + word
+                    else:
+                        line = word
+
+            # Print remaining text
+            if line:
+                y_r = draw_text(last_page, right_x, y_r, line)
+
+        else:
+            y_r = draw_text(last_page, right_x, y_r, f"Address: {address}")
+
+
+    # Only show email and phone if address is NOT multiline
+    if not is_multiline_address:
+        if client_email:
+            y_r = draw_text(last_page, right_x, y_r, f"Email: {client_email}")
+        if client_phone:
+            y_r = draw_text(last_page, right_x, y_r, f"Phone: {client_phone}")
+
+    """if address: y_r = draw_text(last_page, right_x, y_r, f"Address: {address}")
     if client_email: y_r = draw_text(last_page, right_x, y_r, f"Email: {client_email}")
-    if client_phone: y_r = draw_text(last_page, right_x, y_r, f"Phone: {client_phone}")
+    if client_phone: y_r = draw_text(last_page, right_x, y_r, f"Phone: {client_phone}")"""
 
     # Save temp
     temp_merged = output_pdf_path.replace(".pdf", "_pre_gs.pdf")
