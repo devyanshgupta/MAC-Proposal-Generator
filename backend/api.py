@@ -41,6 +41,8 @@ class ClientInfo(BaseModel):
     # Wait, the original had CIN. I should keep CIN just in case, but replace/add PAN.
     CIN: Optional[str] = None
     entityType: Optional[str] = None
+    referenceNumber: Optional[str] = None
+    date: Optional[str] = None
 
 
 class ProposalMeta(BaseModel):
@@ -75,7 +77,15 @@ app.add_middleware(
 @app.get("/api/services")
 def get_services():
     df = pd.read_csv(csv_path)
-    df.fillna("", inplace=True)
+     # Safe handling:
+    # 1. Fill string-expected columns with ""
+    str_cols = ["category", "service", "billingCycle", "scopeOfWork"]
+    for col in str_cols:
+        if col in df.columns:
+            df[col] = df[col].fillna("")
+            
+    # 2. Convert remaining NaNs (numeric columns) to None
+    df = df.astype(object).where(pd.notnull(df), None)
     index = []
     for i, row_data in df.iterrows():
         index.append(f"{row_data['category'][0:3].lower()}-{i + 1}")
@@ -258,10 +268,12 @@ async def make_pdf_secure(
 async def finalize_proposal_endpoint(
     pdf_file: UploadFile = File(...),
     client_details: str = Form(...),
+    document_type: str = Form("engagement"),
     background_tasks: BackgroundTasks = None
 ):
     """
     Finalize the proposal: match inputs, add terms, add page numbers, add signature, secure.
+    Use document_type="engagement" for engagement-specific page-number/signature behavior.
     """
     import json
     try:
@@ -282,7 +294,7 @@ async def finalize_proposal_endpoint(
         content = await pdf_file.read()
         
         # Call the generator logic
-        finalize_proposal(content, details, output_path)
+        finalize_proposal(content, details, output_path, document_type=document_type)
         
         # Schedule cleanup
         if background_tasks:

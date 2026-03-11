@@ -27,15 +27,24 @@ Font.register({
 Font.register({
   family: 'Red Hat Display',
   fonts: [
-    { src: 'fonts/Red_Hat_Display/static/RedHatDisplay-Black.ttf', fontWeight: 'bold' },
+    { src: '/fonts/Red_Hat_Display/static/RedHatDisplay-Black.ttf', fontWeight: 'bold' },
   ]
 });
 
-
+const PAGE_PADDING = 50;
+const LEFT_GUTTER = 80;
+const HEADER_ROW_HEIGHT = 22;
+const HEADER_GAP = 8;
+const DIVIDER_GAP = 20;
+const HEADER_BLOCK_HEIGHT = HEADER_ROW_HEIGHT + HEADER_GAP + DIVIDER_GAP;
+const CONTENT_LEFT = PAGE_PADDING + LEFT_GUTTER;
 
 const styles = StyleSheet.create({
   page: {
-    padding: 50,
+    paddingTop: PAGE_PADDING + HEADER_BLOCK_HEIGHT,
+    paddingRight: PAGE_PADDING,
+    paddingBottom: PAGE_PADDING,
+    paddingLeft: CONTENT_LEFT,
     fontSize: 11,
     fontFamily: "Open Sauce",
     fontStyle: 'normal',
@@ -45,11 +54,14 @@ const styles = StyleSheet.create({
     lineHeight: 1.5,
   },
   headerContainer: {
+    position: "absolute",
+    top: PAGE_PADDING,
+    left: CONTENT_LEFT,
+    right: PAGE_PADDING,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
-    paddingLeft: 80,
+    height: HEADER_ROW_HEIGHT,
   },
   headerLeft: {
     flex: 1,
@@ -64,20 +76,21 @@ const styles = StyleSheet.create({
     color: "#1f3728",
   },
   divider: {
+    position: "absolute",
+    top: PAGE_PADDING + HEADER_ROW_HEIGHT + HEADER_GAP,
+    left: CONTENT_LEFT,
+    right: PAGE_PADDING,
     borderBottomWidth: 2,
     borderBottomColor: "#000",
-    marginBottom: 20,
-  },
-  mainContainer: {
-    flexDirection: "row",
   },
   verticalTitleContainer: {
-    width: 80,
+    position: "absolute",
+    top: PAGE_PADDING + HEADER_BLOCK_HEIGHT,
+    left: PAGE_PADDING,
+    width: LEFT_GUTTER,
     justifyContent: "flex-start",
     alignItems: "flex-start",
     flexShrink: 0,
-    paddingVertical: 20,
-    position: "relative",
   },
   verticalTitleWrapper: {
     position: "absolute",
@@ -102,17 +115,20 @@ const styles = StyleSheet.create({
   },
   servicesContainer: {
     flex: 1,
-    paddingLeft: 0,
   },
   serviceRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    flexDirection: "column",
+    justifyContent: "flex-start",
     paddingVertical: 12,
     paddingLeft: 10,
     borderBottomWidth: 1.5,
     borderBottomColor: "#000",
     //marginLeft: -16,
+  },
+  serviceHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
   },
   serviceDetails: {
     flex: 1,
@@ -155,7 +171,6 @@ const styles = StyleSheet.create({
   notesSection: {
     marginTop: 20,
     padding: 10,
-    marginLeft: 80,
     marginRight: 0,
     textAlign: "right",
   },
@@ -210,9 +225,6 @@ const sanitizeText = (text: string): string => {
     .replace(/[\u2013\u2014]/g, "-"); // Replace en/em dashes with hyphen
 };
 
-// Calculate how many services can fit on a page
-const SERVICES_PER_PAGE = 8; // Adjust based on your layout needs
-
 interface ProposalServicesDocumentProps {
   services: ProposalService[];
   para?: string;
@@ -259,87 +271,73 @@ const renderFormattedText = (text: string) => {
 };
 
 export const ProposalServicesDocument = ({ services, para }: ProposalServicesDocumentProps) => {
-  // Split services into pages
-  const pages: ProposalService[][] = [];
-  for (let i = 0; i < services.length; i += SERVICES_PER_PAGE) {
-    pages.push(services.slice(i, i + SERVICES_PER_PAGE));
-  }
-
-  // If no services, show empty page
-  if (pages.length === 0) {
-    pages.push([]);
-  }
-
   return (
     <Document>
-      {pages.map((pageServices, pageIndex) => (
-        <Page key={pageIndex} size="A4" style={styles.page}>
-          {/* Header Row */}
-          <View style={styles.headerContainer}>
-            <View style={styles.headerLeft}>
-              <Text style={styles.headerText}>Scope of Service</Text>
-            </View>
-            <View style={styles.headerRight}>
-              <Text style={styles.headerText}>Fees (In INR)</Text>
-            </View>
+      <Page size="A4" style={styles.page} wrap>
+        {/* Header Row */}
+        <View style={styles.headerContainer} fixed>
+          <View style={styles.headerLeft}>
+            <Text style={styles.headerText}>Scope of Service</Text>
           </View>
+          <View style={styles.headerRight}>
+            <Text style={styles.headerText}>Fees (In INR)</Text>
+          </View>
+        </View>
 
-          {/* Divider Line */}
-          <View style={styles.divider} />
+        {/* Divider Line */}
+        <View style={styles.divider} fixed />
 
-          {/* Main Content Area */}
-          <View style={styles.mainContainer}>
-            {/* Vertical Title */}
-            <View style={styles.verticalTitleContainer}>
-              <View style={styles.verticalTitleWrapper}>
-                <Text style={styles.verticalTitle}>Proposed Services</Text>
-              </View>
-            </View>
+        {/* Vertical Title */}
+        <View style={styles.verticalTitleContainer} fixed>
+          <View style={styles.verticalTitleWrapper}>
+            <Text style={styles.verticalTitle}>Proposed Services</Text>
+          </View>
+        </View>
 
-            {/* Services List */}
-            <View style={styles.servicesContainer}>
-              {pageServices.map((service, index) => {
-                const fee = service.discountedPrice ?? service.price;
-                return (
-                  <View
-                    key={service.id}
-                    style={[
-                      styles.serviceRow,
-                      index - 1 == pageServices.length - 1 && {//make it index instead of index-1 for removing border at last service
-                        borderBottomWidth: 0,
-                      },
-                    ]}
-                  >
-                    <View style={styles.serviceDetails}>
-                      <Text style={styles.serviceHeading}>{sanitizeText(service.service)}</Text>
-                      {service.scopeOfWork && (
-                        <Text style={styles.serviceDescription}>{sanitizeText(service.scopeOfWork)}</Text>
-                      )}
-                    </View>
-                    <View style={styles.pricingContainer}>
-                      <Text style={styles.serviceFee}>{formatCurrency(fee)}</Text>
-                      {service.billingCycle && (
-                        <Text style={styles.paymentCycle}>({service.billingCycle})</Text>
-                      )}
-                    </View>
+        {/* Services List */}
+        <View style={styles.servicesContainer}>
+          {services.map((service, index) => {
+            const fee = service.discountedPrice ?? service.price;
+            return (
+              <View
+                key={service.id}
+                style={[
+                  styles.serviceRow,
+                  index === services.length - 1 && {
+                    borderBottomWidth: 0,
+                  },
+                ]}
+                minPresenceAhead={48}
+              >
+                <View style={styles.serviceHeaderRow} wrap={false}>
+                  <View style={styles.serviceDetails}>
+                    <Text style={styles.serviceHeading}>{sanitizeText(service.service)}</Text>
                   </View>
-                );
-              })}
-            </View>
-
-
-          </View>
-          {/* Notes from CA */}
-          {pageIndex === pages.length - 1 && para && ( // Only show on the last page of services if para exists
-            <View style={styles.notesSection}>
-              <Text style={styles.notesHeading}>Notes from the CA</Text>
-              <View>
-                {renderFormattedText(para)}
+                  <View style={styles.pricingContainer}>
+                    <Text style={styles.serviceFee}>{formatCurrency(fee)}</Text>
+                    {service.billingCycle && (
+                      <Text style={styles.paymentCycle}>({service.billingCycle})</Text>
+                    )}
+                  </View>
+                </View>
+                {service.scopeOfWork && (
+                  <Text style={styles.serviceDescription}>{sanitizeText(service.scopeOfWork)}</Text>
+                )}
               </View>
+            );
+          })}
+        </View>
+
+        {/* Notes from CA */}
+        {para && (
+          <View style={styles.notesSection}>
+            <Text style={styles.notesHeading}>Notes from the CA</Text>
+            <View>
+              {renderFormattedText(para)}
             </View>
-          )}
-        </Page>
-      ))}
+          </View>
+        )}
+      </Page>
     </Document>
   );
 };
