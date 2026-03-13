@@ -89,25 +89,10 @@ def finalize_proposal(input_pdf_bytes, params, output_pdf_path, document_type="e
     # ---------------------------------------------------------
     # [LOCATION ANSWER] SIGNATURE BLOCK RENDERED HERE
     # ---------------------------------------------------------
+    
     if is_engagement:
         last_page = input_doc[-1]
-
-        # Coordinates from user investigation:
-        # Lowest text y: ~834. Page height: ~842. 
-        # Wait, the lowest text was 834, meaning there is very little space (7.74).
-        # But user said "theres free space at bottom in last page in given pdf".
-        # Let me re-read the investigation. 
-        # "Lowest text y-coordinate: 834.50634765625"
-        # "Free space at bottom: 7.74365234375"
-        # That implies the text goes almost to the bottom.
-        # User said: "paste the page number... IN THIS ATTEMPT one go"
-        # User said: "Add the signature field(as it appears now at the end after terms and conditions) on the pdf on fixed coordinates, as theres free space at bottom in last page in given pdf (read public/terms-and-conditons.pdf for precise coordinates)"
-        # Maybe the "lowest text" I found was the page number or something?
-        # Or maybe there IS space and my check was misleading? 
-        # Let's look at the terms pdf again. 
-        # If I just append the signature at the end, I might need to make sure I don't overwrite.
-        # Assuming there IS space as user claims. I'll put it at Y=700 maybe? 
-        # Let's try to find a safe Y.
+      
 
         client_name = params.get("name", "Client Name")
         proposal_date = params.get("date", "")
@@ -127,7 +112,7 @@ def finalize_proposal(input_pdf_bytes, params, output_pdf_path, document_type="e
         # Left Block (CA)
         left_x = 50
         # Right Block (Client)
-        right_x = 300
+        right_x = 50 #change to 300 if this to be on left
 
         last_page.insert_font(fontname='HKBold', fontfile=normalize_path("public/fonts/hk-grotesk/HKGrotesk-Bold.otf"))
         last_page.insert_font(fontname='HKRegular', fontfile=font_path)
@@ -167,10 +152,53 @@ def finalize_proposal(input_pdf_bytes, params, output_pdf_path, document_type="e
             
         if pan: y_r = draw_text(last_page, right_x, y_r, f"PAN - {pan}")
         y_r = draw_text(last_page, right_x, y_r, f"Date – {proposal_date}")
-        if address: y_r = draw_text(last_page, right_x, y_r, f"Address: {address}")
-        if client_email: y_r = draw_text(last_page, right_x, y_r, f"Email: {client_email}")
-        if client_phone: y_r = draw_text(last_page, right_x, y_r, f"Phone: {client_phone}")
 
+        is_multiline_address = False
+
+        if address:
+            if len(address) > 90:
+                is_multiline_address = True
+                y_r = draw_text(last_page, right_x, y_r, "Address:")
+
+                words = address.split()
+                line = ""
+                first_line = True
+
+                for word in words:
+                    # Check if adding next word exceeds 80 chars
+                    if len(line) + len(word) + 1 > 80:
+                        if first_line:
+                            y_r = draw_text(last_page, right_x, y_r, f"Address: {line}")
+                            first_line = False
+                        else:
+                            y_r = draw_text(last_page, right_x, y_r, line)
+                        line = word  # start new line with current word
+                    else:
+                        if line:
+                            line += " " + word
+                        else:
+                            line = word
+
+                # Print remaining text
+                if line:
+                    y_r = draw_text(last_page, right_x, y_r, line)
+
+            else:
+                y_r = draw_text(last_page, right_x, y_r, f"Address: {address}")
+
+
+        # Only show email and phone if address is NOT multiline
+        if not is_multiline_address:
+            if client_email:
+                y_r = draw_text(last_page, right_x, y_r, f"Email: {client_email}")
+            if client_phone:
+                y_r = draw_text(last_page, right_x, y_r, f"Phone: {client_phone}")
+
+        """if address: y_r = draw_text(last_page, right_x, y_r, f"Address: {address}")
+        if client_email: y_r = draw_text(last_page, right_x, y_r, f"Email: {client_email}")
+        if client_phone: y_r = draw_text(last_page, right_x, y_r, f"Phone: {client_phone}")"""
+        
+        
     # Save temp
     temp_merged = output_pdf_path.replace(".pdf", "_pre_gs.pdf")
     input_doc.save(temp_merged)
