@@ -312,6 +312,7 @@ export const ServiceSelector = () => {
       const formData = new FormData();
       formData.append('pdf_file', blob, `proposal-${payload.proposal.date || "today"}.pdf`);
       formData.append('client_details', JSON.stringify(clientInfo));
+      formData.append('document_type', 'engagement');
 
       const secureResponse = await fetch("/api/proposal/finalize", {
         method: "POST",
@@ -453,13 +454,12 @@ export const ServiceSelector = () => {
       const endDocBlob = await endDocResponse.blob();
       const endDocArrayBuffer = await endDocBlob.arrayBuffer();
 
-      // 4. Merge PDFs
+      // 4. Merge PDFs (cover + services + end)
       const mergedPdf = await PDFDocument.create();
 
       const coverDoc = await PDFDocument.load(coverArrayBuffer);
       const servicesDoc = await PDFDocument.load(servicesArrayBuffer);
       const endDoc = await PDFDocument.load(endDocArrayBuffer);
-
       const coverPages = await mergedPdf.copyPages(coverDoc, coverDoc.getPageIndices());
       coverPages.forEach((page) => mergedPdf.addPage(page));
 
@@ -472,8 +472,23 @@ export const ServiceSelector = () => {
       const mergedPdfBytes = await mergedPdf.save();
       const mergedBlob = new Blob([mergedPdfBytes as BlobPart], { type: "application/pdf" });
 
-      // 5. Download
-      const url = URL.createObjectURL(mergedBlob);
+      // 5. Finalize on backend (append terms + page numbers + ghostscript)
+      const formData = new FormData();
+      formData.append('pdf_file', mergedBlob, `final-proposal-${clientInfo.date || "today"}.pdf`);
+      formData.append('client_details', JSON.stringify(clientInfo));
+      formData.append('document_type', 'proposal');
+
+      const secureResponse = await fetch("/api/proposal/finalize", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!secureResponse.ok) {
+        throw new Error("Failed to finalize PDF");
+      }
+
+      const secureBlob = await secureResponse.blob();
+      const url = URL.createObjectURL(secureBlob);
       const link = document.createElement("a");
       link.href = url;
       link.download = `Final_Proposal_${clientInfo.name.replace(/\s+/g, "_")}_${clientInfo.date || "today"}.pdf`;
