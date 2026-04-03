@@ -62,7 +62,10 @@ class ProposalPayload(BaseModel):
 
 
 app = FastAPI()
-csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "public", "services.csv"))
+csv_path = os.path.normpath("D:\Document Premade Templates\Porposals\services_current.csv")
+
+if not os.path.isfile(csv_path):
+    csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "public", "services.csv"))
 
 # Configure CORS
 app.add_middleware(
