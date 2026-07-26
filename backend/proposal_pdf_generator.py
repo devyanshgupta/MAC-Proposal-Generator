@@ -41,7 +41,10 @@ def finalize_proposal(input_pdf_bytes, params, output_pdf_path, document_type="e
     input_doc = fitz.open("pdf", input_pdf_bytes)
     
     # 2. Load Terms PDF
-    terms_path = normalize_path("public/terms-and-conditons.pdf")
+    if is_engagement:
+        terms_path = normalize_path("public/terms-and-conditions-engagement.pdf")
+    else:
+        terms_path = normalize_path("public/terms-and-conditions-proposal.pdf")
     terms_doc = fitz.open(terms_path)
     
     # 3. Merge: Input + Terms
